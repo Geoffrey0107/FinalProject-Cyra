@@ -37,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         loginBut = (Button) findViewById(R.id.loginBut);
+        registerBut = (Button) findViewById(R.id.registerBut);
 
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +46,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
+        registerBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadFragment(new RegisterFragment());
+            }
+        });
     }
 
     // loads fragments that are created.

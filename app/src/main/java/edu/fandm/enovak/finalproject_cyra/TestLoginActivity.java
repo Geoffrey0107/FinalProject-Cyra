@@ -9,6 +9,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+// WE CAN DELETE THIS LATER
+
 public class TestLoginActivity extends AppCompatActivity {
 
     public static final String EXTRA_USER_ID = "extra_user_id";

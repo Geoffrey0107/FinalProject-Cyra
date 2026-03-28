@@ -102,7 +102,8 @@ public class LoginFragment extends Fragment {
                                                                         Toast.LENGTH_SHORT).show();
 
                                                                 // launch test Activity
-//
+
+                                                                // this is where we would navigate to the main feed
                                                                 Intent i = new Intent(getActivity(), TestLoginActivity.class);
                                                                 i.putExtra(TestLoginActivity.EXTRA_USER_ID, user.getUserId());
                                                                 i.putExtra(TestLoginActivity.EXTRA_USERNAME, user.getUsername());
@@ -113,13 +114,13 @@ public class LoginFragment extends Fragment {
                                                             }
                                                         })
                                                         .addOnFailureListener(e -> {
-                                                            Toast.makeText(getActivity(), "Error fetching user info: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(getActivity(), "Error fetching user info: database error", Toast.LENGTH_SHORT).show();
                                                         });
                                             } else {
-                                                Toast.makeText(getActivity(), "Login Failed: ", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "Login Failed: User not found", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            Toast.makeText(getActivity(), "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity(), "Login failed: User does not exist", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                 } else {

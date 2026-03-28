@@ -229,7 +229,7 @@ public class RegisterFragment extends Fragment {
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(getActivity(), "Account created successfully!", Toast.LENGTH_SHORT).show();
                                         // Optionally navigate to login or main app screen
-
+                                        // THIS WHERE WE WOULD NAVIGATE TO APP
                                         Intent i = new Intent(getActivity(), TestLoginActivity.class);
                                         i.putExtra(TestLoginActivity.EXTRA_USER_ID, user.getUserId());
                                         i.putExtra(TestLoginActivity.EXTRA_USERNAME, user.getUsername());

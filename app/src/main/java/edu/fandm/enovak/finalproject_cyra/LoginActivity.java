@@ -1,10 +1,8 @@
 package edu.fandm.enovak.finalproject_cyra;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import androidx.activity.EdgeToEdge;
@@ -13,14 +11,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-
 
 public class LoginActivity extends AppCompatActivity {
     String TAG = "LOGIN ACTIVITY"; // name of activity
     private Button loginBut;
     private Button registerBut;
+    private Button aboutCyraBut;
 
 
     @Override
@@ -36,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginBut = (Button) findViewById(R.id.loginBut);
         registerBut = (Button) findViewById(R.id.registerBut);
+        aboutCyraBut = (Button) findViewById(R.id.about_cyra_but);
 
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +45,25 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadFragment(new RegisterFragment());
+            }
+        });
+
+        aboutCyraBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
+                        .setTitle("Welcome To Cyra")
+                        .setMessage(
+                                "About Cyra\n\n" +
+
+                                        "Cyra is an app designed for solo travelers that provides activity discovery based on user location. " +
+                                        "Users can browse experiences through the inspiration feed, save activities, and create " +
+                                        "or respond to coordination requests. The app prioritizes privacy, limiting user visibility and " +
+                                        "interactions unless initiated by the user. Uses firebase for authentication, data storage and " +
+                                        "messaging."
+                        )
+                        .setPositiveButton("Got it", null)
+                        .show();
             }
         });
     }

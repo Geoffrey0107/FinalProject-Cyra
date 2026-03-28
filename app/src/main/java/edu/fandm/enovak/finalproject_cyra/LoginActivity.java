@@ -2,7 +2,10 @@ package edu.fandm.enovak.finalproject_cyra;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
+import androidx.fragment.app.Fragment;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +22,8 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
     String TAG = "LOGIN ACTIVITY"; // name of activity
     FirebaseAuth fba;
+    private Button loginBut;
+    private Button registerBut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +36,27 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        fba = FirebaseAuth.getInstance();
-        FirebaseUser user = fba.getCurrentUser();
+        loginBut = (Button) findViewById(R.id.loginBut);
 
-//        if the user actually exists then send them to main page with user info
-//        if (user != null) {
-//
-//        }
+        loginBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadFragment(new LoginFragment());
+            }
+        });
 
+
+    }
+
+    // loads fragments that are created.
+    // fragments will get rid of the need to use new activities every time
+    // it is more space efficient
+
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.login_activity, fragment)
+                .commit();
     }
 
 

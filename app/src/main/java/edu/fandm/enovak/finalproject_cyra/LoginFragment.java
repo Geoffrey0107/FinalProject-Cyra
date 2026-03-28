@@ -1,0 +1,81 @@
+package edu.fandm.enovak.finalproject_cyra;
+
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.text.Layout;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the @link LoginFragment#newInstance factory method to
+ * create an instance of this fragment.
+ */
+public class LoginFragment extends Fragment {
+
+   private EditText emailEditText;
+   private EditText passwordEditText;
+   private Button loginButton;
+
+    public LoginFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     * EditText, emailEditText, passswordEditText
+     * Button, loginButton
+     * @return A new instance of fragment LoginFragment.
+     */
+
+//    public static LoginFragment newInstance(String param1, String param2) {
+//        LoginFragment fragment = new LoginFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
+//    @Override
+//    public void onCreate(LayoutInflater inflater, ViewGroup container,
+//                         Bundle savedInstanceState) {
+//
+//    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        emailEditText = (EditText) view.findViewById(R.id.login_email);
+        passwordEditText = (EditText) view.findViewById(R.id.login_password);
+        loginButton = (Button) view.findViewById(R.id.login_submit);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = emailEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
+
+                if (!email.isEmpty() && !password.isEmpty()) {
+                    Toast.makeText(getActivity(), "Logging in with: " + email,
+                            Toast.LENGTH_SHORT).show();
+                    // ADD FIREBASE LOGIN LOGIC HERE
+                } else {
+                    Toast.makeText(getActivity(), "Please enter email and password",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        return view;
+    }
+}

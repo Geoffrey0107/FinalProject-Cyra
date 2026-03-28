@@ -1,5 +1,6 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the @link LoginFragment#newInstance factory method to
@@ -21,8 +29,9 @@ public class LoginFragment extends Fragment {
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
-
     private Button backButton;
+    private FirebaseAuth fba;
+    private FirebaseFirestore db;
 
 
     public LoginFragment() {
@@ -62,6 +71,9 @@ public class LoginFragment extends Fragment {
         loginButton = (Button) view.findViewById(R.id.login_submit);
         backButton = (Button) view.findViewById(R.id.back_button_login);
 
+        fba = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,9 +81,47 @@ public class LoginFragment extends Fragment {
                 String password = passwordEditText.getText().toString();
 
                 if (!email.isEmpty() && !password.isEmpty()) {
-                    Toast.makeText(getActivity(), "Logging in with: " + email,
-                            Toast.LENGTH_SHORT).show();
-                    // ADD FIREBASE LOGIN LOGIC HERE
+
+                    // firebase logic to get user from database
+                    fba.signInWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            FirebaseUser firebaseUser = fba.getCurrentUser();
+
+                                            if (firebaseUser != null) {
+                                                String uid = firebaseUser.getUid();
+                                                // Fetch user object from Firestore
+                                                db.collection("users").document(uid)
+                                                        .get()
+                                                        .addOnSuccessListener(documentSnapshot -> {
+                                                            if (documentSnapshot.exists()) {
+                                                                User user = documentSnapshot.toObject(User.class);
+
+                                                                // login successful
+                                                                Toast.makeText(getActivity(), "Logging in with: " + email,
+                                                                        Toast.LENGTH_SHORT).show();
+
+                                                                // launch test Activity
+//
+//                                                            Intent i = new Intent(getActivity(), TestActivity.class);
+//                                                            i.putExtra(TestActivity.EXTRA_USER_ID, user.getUserId());
+//                                                            i.putExtra(TestActivity.EXTRA_USERNAME, user.getUsername());
+//                                                            startActivity(i);
+                                                            } else {
+                                                                Toast.makeText(getActivity(), "Logging in with: " + email,
+                                                                        Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Toast.makeText(getActivity(), "Error fetching user info: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                        });
+                                            } else {
+                                                Toast.makeText(getActivity(), "Login Failed: ", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(getActivity(), "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                 } else {
                     Toast.makeText(getActivity(), "Please enter email and password",
                             Toast.LENGTH_SHORT).show();

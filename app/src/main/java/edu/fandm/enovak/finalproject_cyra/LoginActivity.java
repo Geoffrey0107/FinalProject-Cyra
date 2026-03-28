@@ -15,13 +15,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
 
 public class LoginActivity extends AppCompatActivity {
     String TAG = "LOGIN ACTIVITY"; // name of activity
-    FirebaseAuth fba;
     private Button loginBut;
     private Button registerBut;
 
@@ -69,53 +66,53 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // signs user in using email and password
-    private void signIn(String email, String password){
-        Task s = fba.signInWithEmailAndPassword(email, password);
-        s.addOnCompleteListener(new OnCompleteListener() {
-
-            // when user has logged in successfully, get the user and update information
-            // on main page
-            // otherwise log failure
-
-            @Override
-            public void onComplete(Task task) {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = fba.getCurrentUser();
-                    Toast.makeText(getApplicationContext(), "Login Successful!",
-                            Toast.LENGTH_LONG).show();
-//                    updateUI(user);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Failed to login :(",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    // creates a new user with the given email and password
-    private void registerNewUser(String email, String password){
-        Task<AuthResult> task = fba.createUserWithEmailAndPassword(email,
-                password);
-        task.addOnCompleteListener(new OnCompleteListener() {
-
-            // when user is registered successfully, get the user and update information
-            // on main page
-            // otherwise log failure
-            @Override
-            public void onComplete(Task task) {
-                Log.d(TAG, "task: " + task);
-                if (task.isSuccessful()) {
-                    FirebaseUser user = fba.getCurrentUser(); // we're now logged in immediately!
-                            Toast.makeText(getApplicationContext(), "New User Created!",
-                                    Toast.LENGTH_LONG).show();
-//                    updateUI(user);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Failed to create new user :(",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
+//    private void signIn(String email, String password){
+//        Task s = fba.signInWithEmailAndPassword(email, password);
+//        s.addOnCompleteListener(new OnCompleteListener() {
+//
+//            // when user has logged in successfully, get the user and update information
+//            // on main page
+//            // otherwise log failure
+//
+//            @Override
+//            public void onComplete(Task task) {
+//                if (task.isSuccessful()) {
+//                    FirebaseUser user = fba.getCurrentUser();
+//                    Toast.makeText(getApplicationContext(), "Login Successful!",
+//                            Toast.LENGTH_LONG).show();
+////                    updateUI(user);
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Failed to login :(",
+//                            Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//    }
+//
+//    // creates a new user with the given email and password
+//    private void registerNewUser(String email, String password){
+//        Task<AuthResult> task = fba.createUserWithEmailAndPassword(email,
+//                password);
+//        task.addOnCompleteListener(new OnCompleteListener() {
+//
+//            // when user is registered successfully, get the user and update information
+//            // on main page
+//            // otherwise log failure
+//            @Override
+//            public void onComplete(Task task) {
+//                Log.d(TAG, "task: " + task);
+//                if (task.isSuccessful()) {
+//                    FirebaseUser user = fba.getCurrentUser(); // we're now logged in immediately!
+//                            Toast.makeText(getApplicationContext(), "New User Created!",
+//                                    Toast.LENGTH_LONG).show();
+////                    updateUI(user);
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Failed to create new user :(",
+//                            Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//    }
     // Display the user's UID
 //    private void updateUI(FirebaseUser user){
 //        TextView tv = (TextView) findViewById(R.id.fb_login_uid_tv);

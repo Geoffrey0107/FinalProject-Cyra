@@ -1,5 +1,6 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,8 +37,9 @@ public class RegisterFragment extends Fragment {
     private EditText passwordEditText;
     private EditText usernameEditText;
     private Button regButton;
-
     private Button backButton;
+    private FirebaseAuth fba; // firebase auth
+    private FirebaseFirestore db; // firebase database
 
     public RegisterFragment() {
         // Required empty public constructor
@@ -81,14 +88,67 @@ public class RegisterFragment extends Fragment {
             public void onClick(View view) {
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
+                String username = usernameEditText.getText().toString();
 
-                if (!email.isEmpty() && !password.isEmpty()) {
-                    Toast.makeText(getActivity(), "Account Successfully Created!",
-                            Toast.LENGTH_SHORT).show();
+                if (!username.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
                     // ADD FIREBASE REGISTER LOGIC HERE
+
+                    // first check if password follows rules
+
+                    // is it more than 10
+                    if (password.length() < 10) {
+                        Toast.makeText(getActivity(), "password is less than 10 characters",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // does it have any capitals
+                    if (!containsCapital(password)) {
+                        Toast.makeText(getActivity(), "password does not contain one or more capitals",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // does it have any lowercase letters
+                    if (!containsLower(password)) {
+                        Toast.makeText(getActivity(), "password does not contain one or more lowercase letters",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // does it have a number
+                    if (!containsNum(password)) {
+                        Toast.makeText(getActivity(), "password does not contain one or more numbers",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // does it have a special character
+                    if (!containsSpecial(password)) {
+                        Toast.makeText(getActivity(), "password does not contain one or more special characters (!@#$%^&*)",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // checks if username already exists
+                    db.collection("users")
+                            .whereEqualTo("username", username)
+                            .get()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    if (!task.getResult().isEmpty()) {
+                                        Toast.makeText(getActivity(), "Username already exists", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        createFirebaseUser(email, password, username);
+                                        Toast.makeText(getActivity(), "Account Successfully Created!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getActivity(), "Error checking username", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 } else {
-                    // password and username logic
-                    Toast.makeText(getActivity(), "Please enter email and password",
+                    Toast.makeText(getActivity(), "A field was left blank or invalid",
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -105,5 +165,80 @@ public class RegisterFragment extends Fragment {
         });
 
         return view;
+    }
+
+    // checks if string contains a capital
+    private boolean containsCapital(String pass) {
+        for (char c : pass.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // checks if string contains a lowercase
+    private boolean containsLower(String pass) {
+        for (char c : pass.toCharArray()) {
+            if (Character.isLowerCase(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // checks if string contains a number
+    private boolean containsNum(String pass) {
+        for (char c : pass.toCharArray()) {
+            if (Character.isDigit(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // checks if string contains a special character
+    private boolean containsSpecial(String pass) {
+        for (char c : pass.toCharArray()) {
+            if ("!@#$%^&*".indexOf(c) >= 0) { // will return greater than 0 if c is a spec char
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // creates user in firebase
+    private void createFirebaseUser(String email, String password, String username) {
+        fba.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) { // if creation was successful
+                        FirebaseUser firebaseUser = fba.getCurrentUser();
+                        if (firebaseUser != null) { // create firebase user
+                            String uid = firebaseUser.getUid();
+
+                            // Create user object
+                            User user = new User(uid, username, System.currentTimeMillis(),
+                                    true, null, null);
+
+                            // Save to Firestore
+                            db.collection("users").document(uid)
+                                    .set(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(getActivity(), "Account created successfully!", Toast.LENGTH_SHORT).show();
+                                        // Optionally navigate to login or main app screen
+
+//                                        Intent i = new Intent(getActivity(), TestActivity.class);
+//                                        i.putExtra(TestActivity.EXTRA_USER_ID, user.getUserId());
+//                                        i.putExtra(TestActivity.EXTRA_USERNAME, user.getUsername());
+//                                        startActivity(i);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getActivity(), "Error saving user info: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "Error creating account: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

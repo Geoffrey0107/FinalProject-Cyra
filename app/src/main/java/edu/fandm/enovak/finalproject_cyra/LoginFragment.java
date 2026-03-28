@@ -103,10 +103,10 @@ public class LoginFragment extends Fragment {
 
                                                                 // launch test Activity
 //
-//                                                            Intent i = new Intent(getActivity(), TestActivity.class);
-//                                                            i.putExtra(TestActivity.EXTRA_USER_ID, user.getUserId());
-//                                                            i.putExtra(TestActivity.EXTRA_USERNAME, user.getUsername());
-//                                                            startActivity(i);
+                                                                Intent i = new Intent(getActivity(), TestLoginActivity.class);
+                                                                i.putExtra(TestLoginActivity.EXTRA_USER_ID, user.getUserId());
+                                                                i.putExtra(TestLoginActivity.EXTRA_USERNAME, user.getUsername());
+                                                                startActivity(i);
                                                             } else {
                                                                 Toast.makeText(getActivity(), "Logging in with: " + email,
                                                                         Toast.LENGTH_SHORT).show();

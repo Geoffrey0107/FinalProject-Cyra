@@ -83,6 +83,9 @@ public class RegisterFragment extends Fragment {
         regButton = (Button) view.findViewById(R.id.reg_submit);
         backButton = (Button) view.findViewById(R.id.back_button_register);
 
+        fba = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -227,10 +230,10 @@ public class RegisterFragment extends Fragment {
                                         Toast.makeText(getActivity(), "Account created successfully!", Toast.LENGTH_SHORT).show();
                                         // Optionally navigate to login or main app screen
 
-//                                        Intent i = new Intent(getActivity(), TestActivity.class);
-//                                        i.putExtra(TestActivity.EXTRA_USER_ID, user.getUserId());
-//                                        i.putExtra(TestActivity.EXTRA_USERNAME, user.getUsername());
-//                                        startActivity(i);
+                                        Intent i = new Intent(getActivity(), TestLoginActivity.class);
+                                        i.putExtra(TestLoginActivity.EXTRA_USER_ID, user.getUserId());
+                                        i.putExtra(TestLoginActivity.EXTRA_USERNAME, user.getUsername());
+                                        startActivity(i);
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(getActivity(), "Error saving user info: " + e.getMessage(), Toast.LENGTH_SHORT).show();

@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,12 @@ import android.widget.Toast;
  */
 public class LoginFragment extends Fragment {
 
-   private EditText emailEditText;
-   private EditText passwordEditText;
-   private Button loginButton;
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private Button loginButton;
+
+    private Button backButton;
+
 
     public LoginFragment() {
         // Required empty public constructor
@@ -58,6 +60,7 @@ public class LoginFragment extends Fragment {
         emailEditText = (EditText) view.findViewById(R.id.login_email);
         passwordEditText = (EditText) view.findViewById(R.id.login_password);
         loginButton = (Button) view.findViewById(R.id.login_submit);
+        backButton = (Button) view.findViewById(R.id.back_button_login);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +75,16 @@ public class LoginFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(), "Please enter email and password",
                             Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // returns to parent i.e. the login activity
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
                 }
             }
         });

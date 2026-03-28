@@ -32,6 +32,8 @@ public class RegisterFragment extends Fragment {
     private EditText usernameEditText;
     private Button regButton;
 
+    private Button backButton;
+
     public RegisterFragment() {
         // Required empty public constructor
     }
@@ -72,6 +74,7 @@ public class RegisterFragment extends Fragment {
         passwordEditText = (EditText) view.findViewById(R.id.reg_password);
         usernameEditText = (EditText) view.findViewById(R.id.reg_username);
         regButton = (Button) view.findViewById(R.id.reg_submit);
+        backButton = (Button) view.findViewById(R.id.back_button_register);
 
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +90,16 @@ public class RegisterFragment extends Fragment {
                     // password and username logic
                     Toast.makeText(getActivity(), "Please enter email and password",
                             Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // returns to parent i.e. the login activity
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
                 }
             }
         });

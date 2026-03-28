@@ -1,6 +1,9 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,9 +23,14 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        System.out.println("This is Geoffrey");
-        System.out.println("This is Angie");
-        System.out.println("This is Damien");
-        System.out.println("This is Manal");
+        Button testBut = (Button) findViewById(R.id.testBut);
+
+        testBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(i);
+            }
+        });
     }
 }

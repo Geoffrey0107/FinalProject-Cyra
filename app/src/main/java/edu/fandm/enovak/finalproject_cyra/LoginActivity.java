@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBut;
     private Button registerBut;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.login_activity, fragment)
+                .addToBackStack(null) // adds to the back of stack so it can be popped to return to parent activity
                 .commit();
     }
 

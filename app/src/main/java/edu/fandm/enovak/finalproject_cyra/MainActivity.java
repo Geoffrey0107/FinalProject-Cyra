@@ -20,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
     ImageButton btnAdd1, btnAdd2;
     LinearLayout navActivity, navItinerary;
 
+    public static final String EXTRA_USER_ID = "extra_user_id";
+    public static final String EXTRA_USERNAME = "extra_username";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,11 +70,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        String userId = getIntent().getStringExtra(EXTRA_USER_ID);
+        String username = getIntent().getStringExtra(EXTRA_USERNAME);
     }
 
     private void addToItinerary(String activityName) {
         if (!ItineraryData.itineraryList.contains(activityName)) {
             ItineraryData.itineraryList.add(activityName);
+            ItineraryData.userId = EXTRA_USER_ID;
             Toast.makeText(MainActivity.this, activityName + " added to itinerary", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, activityName + " is already in itinerary", Toast.LENGTH_SHORT).show();

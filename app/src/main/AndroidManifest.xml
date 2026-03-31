@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProjectCyra">
         <activity
+            android:name=".PendingVerificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".Itinerary"
             android:exported="false" />
         <activity

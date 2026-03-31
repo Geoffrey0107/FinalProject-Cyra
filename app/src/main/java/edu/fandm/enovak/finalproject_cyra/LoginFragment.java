@@ -90,7 +90,7 @@ public class LoginFragment extends Fragment {
 
                                             if (firebaseUser != null) {
                                                 String uid = firebaseUser.getUid();
-                                                // Fetch user object from Firestore
+                                                // Fetch user object from Firestore colelction user
                                                 db.collection("users").document(uid)
                                                         .get()
                                                         .addOnSuccessListener(documentSnapshot -> {
@@ -105,8 +105,8 @@ public class LoginFragment extends Fragment {
 
                                                                 // this is where we would navigate to the main feed
                                                                 Intent i = new Intent(getActivity(), TestLoginActivity.class);
-                                                                i.putExtra(TestLoginActivity.EXTRA_USER_ID, user.getUserId());
-                                                                i.putExtra(TestLoginActivity.EXTRA_USERNAME, user.getUsername());
+                                                                i.putExtra(MainActivity.EXTRA_USER_ID, user.getUserId());
+                                                                i.putExtra(MainActivity.EXTRA_USERNAME, user.getUsername());
                                                                 startActivity(i);
                                                             } else {
                                                                 Toast.makeText(getActivity(), "Logging in with: " + email,

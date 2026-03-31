@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginFragment"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#228B22">
+
+    <EditText
+        android:id="@+id/reg_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/reg_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/reg_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Password rules TextView -->
+    <TextView
+        android:id="@+id/password_rules"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Password must be at least 10 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/reg_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1B6B1B"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/back_button_register"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/round_button"
+        android:text="BACK"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+</LinearLayout>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/forest_green"
+        android:padding="24dp">
+
+        <!-- App Title -->
+        <TextView
+            android:id="@+id/welcome_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to Cyra"
+            android:textSize="32sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"/>
+
+        <!-- Tagline or subtitle -->
+        <TextView
+            android:id="@+id/welcome_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Solo Travelling"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:layout_below="@id/welcome_title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Buttons container -->
+        <LinearLayout
+            android:id="@+id/button_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:layout_marginTop="40dp">
+
+            <Button
+                android:id="@+id/loginBut"
+                android:layout_width="250dp"
+                android:layout_height="60dp"
+                android:text="Login"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/forest_green_dark"
+                android:elevation="6dp"
+                android:layout_marginBottom="20dp"
+                android:textAllCaps="false"
+                android:padding="12dp"/>
+
+            <Button
+                android:id="@+id/registerBut"
+                android:layout_width="250dp"
+                android:layout_height="60dp"
+                android:text="Register"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/forest_green_dark"
+                android:elevation="6dp"
+                android:layout_marginBottom="20dp"
+                android:textAllCaps="false"
+                android:padding="12dp"/>
+
+            <Button
+                android:id="@+id/about_cyra_but"
+                android:layout_width="250dp"
+                android:layout_height="60dp"
+                android:text="About Cyra"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/forest_green_dark"
+                android:elevation="6dp"
+                android:textAllCaps="false"
+                android:padding="12dp"/>
+        </LinearLayout>
+
+        <!-- Footer text -->
+        <TextView
+            android:id="@+id/footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="© 2026 Cyra"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"/>
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

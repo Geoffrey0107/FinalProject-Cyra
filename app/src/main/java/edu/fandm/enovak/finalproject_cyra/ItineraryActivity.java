@@ -25,6 +25,9 @@ public class ItineraryActivity extends AppCompatActivity {
         itineraryListView = findViewById(R.id.itineraryListView);
         navActivity = findViewById(R.id.navActivity);
 
+        if (itineraryListView == null) {
+            throw new RuntimeException("ListView not found");
+        }
 
         adapter = new ArrayAdapter<>(
                 this,
@@ -52,6 +55,13 @@ public class ItineraryActivity extends AppCompatActivity {
         });
         navActivity.setOnClickListener(v -> {
             Intent intent = new Intent(ItineraryActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+        itineraryListView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedPlace = ItineraryData.itineraryList.get(position);
+
+            Intent intent = new Intent(ItineraryActivity.this, ReviewActivity.class);
+            intent.putExtra("place_name", selectedPlace);
             startActivity(intent);
         });
     }

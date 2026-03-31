@@ -49,6 +49,8 @@
                 android:src="@drawable/outline_chat_24" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Chat"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -68,6 +70,8 @@
                 android:src="@drawable/outline_browse_activity_24" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Activity"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -86,7 +90,9 @@
                 android:src="@drawable/outline_search_24" />
 
             <TextView
-                android:text="Search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chat"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -105,9 +111,10 @@
                 android:src="@drawable/itinerary" />
 
             <TextView
-                android:text="Itinerary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chat"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>

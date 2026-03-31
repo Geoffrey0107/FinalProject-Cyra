@@ -5,4 +5,5 @@
     <color name="forest_green">#228B22</color>
     <color name="forest_green_dark">#1B6B1B</color>
     <color name="button_overlay">#AAFFFFFF</color>
+    <color name="rating_background">#EAF4EA</color>
 </resources>

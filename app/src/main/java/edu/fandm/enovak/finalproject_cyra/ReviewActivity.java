@@ -1,11 +1,12 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,68 +24,67 @@ public class ReviewActivity extends AppCompatActivity {
     private TextView tvRatingValue;
     private EditText etReviewText;
     private Button btnSubmitReview;
+    private TextView tvReviewTitle;
+
+    LinearLayout navActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
 
-        // Initialize UI Elements
+
         spinnerPlaces = findViewById(R.id.spinner_places);
         ratingBar = findViewById(R.id.rating_bar);
         tvRatingValue = findViewById(R.id.tv_rating_value);
         etReviewText = findViewById(R.id.et_review_text);
         btnSubmitReview = findViewById(R.id.btn_submit_review);
+        tvReviewTitle = findViewById(R.id.tv_review_title);
+        navActivity = findViewById(R.id.navActivity);
 
-        // --- 1. SET UP THE SPINNER (DROPDOWN MENU) ---
 
-        // Example data: A list of places the user "has visited"
+        String selectedPlaceFromItinerary = getIntent().getStringExtra("place_name");
+
         List<String> visitedPlaces = new ArrayList<>();
-        visitedPlaces.add("-- Select a Place --"); // Prompt text
-        visitedPlaces.add("Eiffel Tower");
-        visitedPlaces.add("The Colosseum");
-        visitedPlaces.add("Kyoto Arashiyama Bamboo Grove");
-        visitedPlaces.add("Times Square NYC");
-        visitedPlaces.add("The Great Wall of China");
+        visitedPlaces.add("-- Select a Place --");
 
-        // Create an ArrayAdapter using the simple_spinner_item layout
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, visitedPlaces);
+        // add itinerary items into spinner
+        visitedPlaces.addAll(ItineraryData.itineraryList);
 
-        // Specify the layout to use when the list of choices appears
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                visitedPlaces
+        );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
         spinnerPlaces.setAdapter(adapter);
 
-
-        // --- 2. SET UP RATING BAR LISTENER ---
-        // Update the text view below the rating bar dynamically
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                // Cast to integer to show whole number stars (as requested: 1-5)
-                int intRating = (int) rating;
-                tvRatingValue.setText(intRating + " / 5 Stars");
+        // preselect the tapped place if it exists
+        if (selectedPlaceFromItinerary != null) {
+            int position = visitedPlaces.indexOf(selectedPlaceFromItinerary);
+            if (position >= 0) {
+                spinnerPlaces.setSelection(position);
+                tvReviewTitle.setText("Review: " + selectedPlaceFromItinerary);
             }
+        }
+
+        ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            int intRating = (int) rating;
+            tvRatingValue.setText(intRating + " / 5 Stars");
+        });
+        navActivity.setOnClickListener(v -> {
+            Intent intent = new Intent(ReviewActivity.this, MainActivity.class);
+            startActivity(intent);
         });
 
-
-        // --- 3. SET UP SUBMIT BUTTON LOGIC ---
-        btnSubmitReview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitReviewData();
-            }
-        });
+        btnSubmitReview.setOnClickListener(v -> submitReviewData());
     }
 
-    // Method to handle validation and submission
     private void submitReviewData() {
         String selectedPlace = spinnerPlaces.getSelectedItem().toString();
         int starRating = (int) ratingBar.getRating();
         String reviewText = etReviewText.getText().toString().trim();
 
-        // VALIDATION
         if (selectedPlace.equals("-- Select a Place --")) {
             Toast.makeText(this, "Please select a place to review.", Toast.LENGTH_SHORT).show();
             return;
@@ -101,15 +101,10 @@ public class ReviewActivity extends AppCompatActivity {
             return;
         }
 
-        // SUBMISSION LOGIC (Where you send data to your server/database)
-        // For now, we show a success message with the data.
         String summary = "Review Submitted for " + selectedPlace + "\n" +
                 "Rating: " + starRating + " Stars\n" +
                 "Review: \"" + reviewText + "\"";
 
         Toast.makeText(this, summary, Toast.LENGTH_LONG).show();
-
-        // Optional: Finish the activity and go back to previous screen
-        // finish();
     }
 }

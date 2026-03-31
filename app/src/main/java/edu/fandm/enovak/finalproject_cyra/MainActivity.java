@@ -67,11 +67,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        navItinerary.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ItineraryActivity.class);
-            startActivity(intent);
-        });
     }
 
     private void addToItinerary(String activityName) {

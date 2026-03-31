@@ -32,18 +32,18 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        testBut = findViewById(R.id.testBut);
         btnAdd1 = findViewById(R.id.btnAdd1);
         btnAdd2 = findViewById(R.id.btnAdd2);
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
 
-        testBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(i);
-            }
+        ImageButton btnProfile, btnMore;
+
+        btnProfile = findViewById(R.id.btnProfile);
+        btnMore = findViewById(R.id.btnMore);
+        btnMore.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
         });
 
         btnAdd1.setOnClickListener(new View.OnClickListener() {

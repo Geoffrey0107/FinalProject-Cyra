@@ -1,7 +1,9 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -13,12 +15,16 @@ public class ItineraryActivity extends AppCompatActivity {
     ListView itineraryListView;
     ArrayAdapter<String> adapter;
 
+    LinearLayout navActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
 
         itineraryListView = findViewById(R.id.itineraryListView);
+        navActivity = findViewById(R.id.navActivity);
+
 
         adapter = new ArrayAdapter<>(
                 this,
@@ -43,6 +49,10 @@ public class ItineraryActivity extends AppCompatActivity {
                     .show();
 
             return true;
+        });
+        navActivity.setOnClickListener(v -> {
+            Intent intent = new Intent(ItineraryActivity.this, MainActivity.class);
+            startActivity(intent);
         });
     }
 }

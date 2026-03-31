@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button testBut;
     ImageButton btnAdd1, btnAdd2;
-    LinearLayout navItinerary;
+    LinearLayout navActivity, navItinerary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         testBut = findViewById(R.id.testBut);
         btnAdd1 = findViewById(R.id.btnAdd1);
         btnAdd2 = findViewById(R.id.btnAdd2);
+        navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
 
         testBut.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ItineraryActivity.class);
                 startActivity(intent);
             }
+        });
+
+        navItinerary.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ItineraryActivity.class);
+            startActivity(intent);
         });
     }
 

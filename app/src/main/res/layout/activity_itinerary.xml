@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="#F8FAFC">
 
+    <!-- Title -->
     <TextView
         android:id="@+id/tvItineraryTitle"
         android:layout_width="wrap_content"
@@ -14,11 +14,102 @@
         android:textSize="28sp"
         android:textStyle="bold"
         android:textColor="#1E3A5F"
-        android:layout_marginBottom="16dp" />
+        android:padding="16dp" />
 
+    <!-- List (takes remaining space) -->
     <ListView
         android:id="@+id/itineraryListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
+
+    <!-- Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#FFFFFF"
+        android:elevation="8dp">
+
+        <!-- Chat -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/outline_chat_24" />
+
+            <TextView
+                android:text="Chat"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Activity -->
+        <LinearLayout
+            android:id="@+id/navActivity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/outline_browse_activity_24" />
+
+            <TextView
+                android:text="Activity"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Search -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/outline_search_24" />
+
+            <TextView
+                android:text="Search"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Itinerary (active) -->
+        <LinearLayout
+            android:id="@+id/navItinerary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/itinerary" />
+
+            <TextView
+                android:text="Itinerary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

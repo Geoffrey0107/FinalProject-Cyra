@@ -17,6 +17,9 @@
             android:name=".Itinerary"
             android:exported="false" />
         <activity
+            android:name=".PlaceDetails"
+            android:exported="false" />
+        <activity
             android:name=".ReviewActivity"
             android:exported="false" />
         <activity

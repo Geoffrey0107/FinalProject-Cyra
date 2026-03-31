@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
+//import com.bumptech.glide.Glide;
 
 public class PlaceDetails extends AppCompatActivity {
 
@@ -31,10 +31,10 @@ public class PlaceDetails extends AppCompatActivity {
         placeDescription.setText("An iconic urban park in New York City. This text will dynamically update once connected to the API.");
 
 
-        String imageUrl = "https://images.unsplash.com/photo-1510257323136-22797e88fb98";
-        Glide.with(this)
-                .load(imageUrl)
-                .into(placeImage);
+//        String imageUrl = "https://images.unsplash.com/photo-1510257323136-22797e88fb98";
+//        Glide.with(this)
+//                .load(imageUrl)
+//                .into(placeImage);
 
 
         btnReview.setOnClickListener(new View.OnClickListener() {

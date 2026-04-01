@@ -107,7 +107,7 @@ public class LoginFragment extends Fragment {
                                                                         Toast.LENGTH_SHORT).show();
 
                                                                 // this is where we would navigate to the main feed
-                                                                Intent i = new Intent(getActivity(), TestLoginActivity.class);
+                                                                Intent i = new Intent(getActivity(), MainActivity.class);
                                                                 i.putExtra(MainActivity.EXTRA_USER_ID, user.getUserId());
                                                                 i.putExtra(MainActivity.EXTRA_USERNAME, user.getUsername());
                                                                 startActivity(i);

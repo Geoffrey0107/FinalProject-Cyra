@@ -208,7 +208,8 @@ public class RegisterFragment extends Fragment {
         return false;
     }
 
-    // creates user in firebase
+    // creates user in firebase with the given email, password
+    // creates user object in firebase with username, uid from user account from auth, and timestamp
     private void createFirebaseUser(String email, String password, String username) {
         fba.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -224,32 +225,12 @@ public class RegisterFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Verification email sent to " +
                                             firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
 
+                                    // go to pending verification activity for verification
                                     Intent i = new Intent(getActivity(), PendingVerificationActivity.class);
-                                    i.putExtra("username", username);
+                                    i.putExtra("username", username); // sends username
                                     startActivity(i);
 
-//                                    String uid = firebaseUser.getUid();
-//
-//                                    // Create user object
-//                                    User user = new User(uid, username, System.currentTimeMillis(),
-//                                            true, null, null);
-//
-//                                    // Save to Firestore collection titled "users"
-//                                    db.collection("users").document(uid)
-//                                            .set(user)
-//                                            .addOnSuccessListener(aVoid -> {
-//                                                Toast.makeText(getActivity(), "Account created successfully!", Toast.LENGTH_SHORT).show();
-//
-//                                                // navigates back to main
-//                                                Intent i = new Intent(getActivity(), TestLoginActivity.class);
-//                                                i.putExtra(MainActivity.EXTRA_USER_ID, user.getUserId());
-//                                                i.putExtra(MainActivity.EXTRA_USERNAME, user.getUsername());
-//                                                startActivity(i);
-//                                            })
-//                                            .addOnFailureListener(e -> {
-//                                                Toast.makeText(getActivity(), "Error saving user info: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                                            });
-                                } else {
+                                } else { // failure message
                                     Toast.makeText(getActivity(), "Failed to send verification email.", Toast.LENGTH_SHORT).show();
                                 }
                             });

@@ -6,6 +6,8 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="32dp"
+    android:clickable="true"
+    android:focusable="true"
     android:background="@color/forest_green">
 
     <!-- Title / Instruction -->
@@ -23,7 +25,8 @@
         android:id="@+id/pending_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="A verification email has been sent to your address. Please check your inbox and verify your email to continue."
+        android:text="A verification email has been sent to your address. Please check your inbox and verify your email to continue. It may have appeared in spam.
+        \n\nIf the email failed to send, you may retry in 1 minute."
         android:textSize="16sp"
         android:textColor="#FFFFFF"
         android:gravity="center"

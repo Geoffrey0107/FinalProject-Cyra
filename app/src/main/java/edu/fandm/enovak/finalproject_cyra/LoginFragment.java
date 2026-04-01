@@ -41,7 +41,7 @@ public class LoginFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     * EditText, emailEditText, passswordEditText
+     * EditText, emailEditText, passwordEditText
      * Button, loginButton
      * @return A new instance of fragment LoginFragment.
      */
@@ -66,11 +66,13 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        // initializes buttons and edit texts
         emailEditText = (EditText) view.findViewById(R.id.login_email);
         passwordEditText = (EditText) view.findViewById(R.id.login_password);
         loginButton = (Button) view.findViewById(R.id.login_submit);
         backButton = (Button) view.findViewById(R.id.back_button_login);
 
+        // initializes firebase auth instance and firestore database instance
         fba = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -80,28 +82,29 @@ public class LoginFragment extends Fragment {
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
 
+                // if email and password are filled
                 if (!email.isEmpty() && !password.isEmpty()) {
 
-                    // firebase logic to get user from database
+                    // firebase logic to get user from
+                    // tries to sign in with email and password
                     fba.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener(task -> {
                                         if (task.isSuccessful()) {
+                                            // get the current user
                                             FirebaseUser firebaseUser = fba.getCurrentUser();
 
                                             if (firebaseUser != null) {
-                                                String uid = firebaseUser.getUid();
-                                                // Fetch user object from Firestore colelction user
+                                                String uid = firebaseUser.getUid(); // gets user id
+                                                // Fetch user object from Firestore collection user
                                                 db.collection("users").document(uid)
                                                         .get()
-                                                        .addOnSuccessListener(documentSnapshot -> {
-                                                            if (documentSnapshot.exists()) {
-                                                                User user = documentSnapshot.toObject(User.class);
+                                                        .addOnSuccessListener(documentSnapshot -> { // if it succeeds, pass snapshot of current user/document
+                                                            if (documentSnapshot.exists()) { // checks if user actually exists
+                                                                User user = documentSnapshot.toObject(User.class); // converts it back to user object
 
                                                                 // login successful
                                                                 Toast.makeText(getActivity(), "Logging in with: " + email,
                                                                         Toast.LENGTH_SHORT).show();
-
-                                                                // launch test Activity
 
                                                                 // this is where we would navigate to the main feed
                                                                 Intent i = new Intent(getActivity(), TestLoginActivity.class);

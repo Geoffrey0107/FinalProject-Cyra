@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_like"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Like" />
+    <item
+        android:id="@+id/nav_add"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Add" />
+    <item
+        android:id="@+id/nav_places"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="Places" />
+    <item
+        android:id="@+id/nav_account"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="Account" />
+</menu>

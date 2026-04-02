@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class SearchActivity extends AppCompatActivity {
 
     private static final String[] places = {
+            "Lancaster, PA, United States",
             "Tokyo, Japan",
             "London, United Kingdom",
             "New York City, United States",
@@ -33,7 +34,6 @@ public class SearchActivity extends AppCompatActivity {
             "Singapore, Singapore"
     };
 
-    private ImageButton btnBack;
     private TextView textSearchQuery;
 
     @Override
@@ -42,20 +42,12 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
 
-        btnBack = findViewById(R.id.btnBack);
         textSearchQuery = findViewById(R.id.textSearchQuery);
 
         String query = getIntent().getStringExtra("SEARCH_QUERY");
         if (query != null && !query.isEmpty()) {
             textSearchQuery.setText("Showing results for: \"" + query + "\"");
         }
-
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getApplicationContext(),

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="app">
+      <SelectionState runConfigName="UserProfile">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2026-04-02T15:53:57.634869Z">
           <Target type="DEFAULT_BOOT">

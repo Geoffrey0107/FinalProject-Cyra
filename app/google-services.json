@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "128574574082",
+    "project_id": "cyra-c61a5",
+    "storage_bucket": "cyra-c61a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128574574082:android:b149252110f5b98912e11b",
+        "android_client_info": {
+          "package_name": "edu.fandm.enovak.finalproject_cyra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsCb2cdHsjlbqGGqm2e9Kh2cOSnIBKpC4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

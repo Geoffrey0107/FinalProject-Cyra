@@ -57,4 +57,7 @@ dependencies {
     // import firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     implementation("com.google.firebase:firebase-analytics")
+
+    // Glide library for image loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

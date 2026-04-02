@@ -123,7 +123,7 @@ public class LoginFragment extends Fragment {
                                                 Toast.makeText(getActivity(), "Login Failed: User not found", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            Toast.makeText(getActivity(), "Login failed: User does not exist", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity(), "Login failed: email or password was wrong.", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                 } else {

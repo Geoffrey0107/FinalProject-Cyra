@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tvTopLocation = findViewById(R.id.tvTopLocation);
-        navPost = findViewById(R.id.navPost);
 
         tvTopLocation.setText(selectedCity);
 
         //btnAdd1 = findViewById(R.id.btnAdd1);
         //btnAdd2 = findViewById(R.id.btnAdd2);
-        //navActivity = findViewById(R.id.navActivity);
+        navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
+        navPost = findViewById(R.id.navPost);
 
         placesListView = findViewById(R.id.placesListView);
         postList = new ArrayList<>();

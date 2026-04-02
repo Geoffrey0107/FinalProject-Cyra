@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button testBut;
     ImageButton btnAdd1, btnAdd2;
-    LinearLayout navActivity, navItinerary, navPost;
+    LinearLayout navActivity, navItinerary, navPost, navSearch;
 
     String selectedCountry = "USA";
     String selectedState = "PA";
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+        navSearch = findViewById(R.id.navSearch);
 
         placesListView = findViewById(R.id.placesListView);
         postList = new ArrayList<>();
@@ -103,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
 
         navPost.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
+            startActivity(intent);
+        });
+
+        navSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intent);
         });
 

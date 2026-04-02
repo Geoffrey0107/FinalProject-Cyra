@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Initialize UI Elements
-        btnAdd1 = findViewById(R.id.btnAdd1);
-        btnAdd2 = findViewById(R.id.btnAdd2);
-        navActivity = findViewById(R.id.navActivity);
+//        btnAdd1 = findViewById(R.id.btnAdd1);
+//        btnAdd2 = findViewById(R.id.btnAdd2);
+//        navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);

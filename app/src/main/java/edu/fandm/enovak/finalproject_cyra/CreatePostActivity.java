@@ -1,13 +1,16 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,7 +27,8 @@ public class CreatePostActivity extends AppCompatActivity {
 
     EditText etTitle, etDescription;
     Button btnSubmitPost, btnSelectImage;
-    ImageButton btnClose;
+
+    LinearLayout navActivity, navItinerary, navPost;
 
     String selectedCountry = "USA";
     String selectedState = "PA";
@@ -38,11 +42,14 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
+        navActivity = findViewById(R.id.navActivity);
+        navItinerary = findViewById(R.id.navItinerary);
+        navPost = findViewById(R.id.navPost);
+
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         btnSubmitPost = findViewById(R.id.btnSubmitPost);
         btnSelectImage = findViewById(R.id.btnUploadImage);
-        btnClose = findViewById(R.id.btnClose);
 
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
@@ -57,7 +64,19 @@ public class CreatePostActivity extends AppCompatActivity {
 
         btnSelectImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
 
-        btnClose.setOnClickListener(v -> finish());
+        navActivity.setOnClickListener(v -> {
+            Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+
+        navItinerary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CreatePostActivity.this, ItineraryActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnSubmitPost.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();

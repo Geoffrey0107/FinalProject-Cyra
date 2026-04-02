@@ -15,15 +15,17 @@ public class ItineraryActivity extends AppCompatActivity {
     ListView itineraryListView;
     ArrayAdapter<String> adapter;
 
-    LinearLayout navActivity;
+    LinearLayout navActivity, navItinerary, navPost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
 
-        itineraryListView = findViewById(R.id.itineraryListView);
         navActivity = findViewById(R.id.navActivity);
+        navItinerary = findViewById(R.id.navItinerary);
+        navPost = findViewById(R.id.navPost);
+        itineraryListView = findViewById(R.id.itineraryListView);
 
         if (itineraryListView == null) {
             throw new RuntimeException("ListView not found");
@@ -55,6 +57,11 @@ public class ItineraryActivity extends AppCompatActivity {
         });
         navActivity.setOnClickListener(v -> {
             Intent intent = new Intent(ItineraryActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+        navPost.setOnClickListener(v -> {
+            Intent intent = new Intent(ItineraryActivity.this, CreatePostActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
         itineraryListView.setOnItemClickListener((parent, view, position, id) -> {

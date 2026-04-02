@@ -2,10 +2,14 @@ package edu.fandm.enovak.finalproject_cyra;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -14,14 +18,28 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     Button testBut;
     ImageButton btnAdd1, btnAdd2;
-    LinearLayout navActivity, navItinerary;
+    LinearLayout navActivity, navItinerary, navPost;
 
+    String selectedCountry = "USA";
+    String selectedState = "PA";
+    String selectedCity = "Lancaster";
+    TextView tvTopLocation;
+
+    ArrayList<Post> postList;
+    PostAdapter postAdapter;
+    ListView placesListView;
     public static final String EXTRA_USER_ID = "extra_user_id";
     public static final String EXTRA_USERNAME = "extra_username";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +53,22 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        btnAdd1 = findViewById(R.id.btnAdd1);
-        btnAdd2 = findViewById(R.id.btnAdd2);
-        navActivity = findViewById(R.id.navActivity);
+        tvTopLocation = findViewById(R.id.tvTopLocation);
+        navPost = findViewById(R.id.navPost);
+
+        tvTopLocation.setText(selectedCity);
+
+        //btnAdd1 = findViewById(R.id.btnAdd1);
+        //btnAdd2 = findViewById(R.id.btnAdd2);
+        //navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
+
+        placesListView = findViewById(R.id.placesListView);
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(this, postList);
+        placesListView.setAdapter(postAdapter);
+
+        loadPosts();
 
         ImageButton btnProfile, btnMore;
 
@@ -49,19 +79,19 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnAdd1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addToItinerary("Central Market");
-            }
-        });
-
-        btnAdd2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addToItinerary("River Trail Walk");
-            }
-        });
+//        btnAdd1.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                addToItinerary("Central Market");
+//            }
+//        });
+//
+//        btnAdd2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                addToItinerary("River Trail Walk");
+//            }
+//        });
 
         navItinerary.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,17 +101,73 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String userId = getIntent().getStringExtra(EXTRA_USER_ID);
-        String username = getIntent().getStringExtra(EXTRA_USERNAME);
+        navPost.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
+            startActivity(intent);
+        });
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("posts")
+                .whereEqualTo("country", "USA")
+                .whereEqualTo("state", "PA")
+                .whereEqualTo("city", "Lancaster")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Log.d("FIRESTORE", "Loaded posts: " + postList.size());
+                    postList.clear();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Post post = doc.toObject(Post.class);
+                        if (post != null) {
+                            postList.add(post);
+                            Log.d("FIRESTORE", "Post title: " + post.getTitle());
+                        }
+                    }
+
+                    postAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void addToItinerary(String activityName) {
         if (!ItineraryData.itineraryList.contains(activityName)) {
             ItineraryData.itineraryList.add(activityName);
-            ItineraryData.userId = EXTRA_USER_ID;
             Toast.makeText(MainActivity.this, activityName + " added to itinerary", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(MainActivity.this, activityName + " is already in itinerary", Toast.LENGTH_SHORT).show();
         }
+    }
+    private void loadPosts() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("posts")
+                .whereEqualTo("country", selectedCountry)
+                .whereEqualTo("state", selectedState)
+                .whereEqualTo("city", selectedCity)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    postList.clear();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Post post = doc.toObject(Post.class);
+                        if (post != null) {
+                            postList.add(post);
+                        }
+                    }
+
+                    postAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadPosts();
     }
 }

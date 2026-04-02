@@ -1,0 +1,137 @@
+package edu.fandm.enovak.finalproject_cyra;
+
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.ByteArrayOutputStream;
+
+public class CreatePostActivity extends AppCompatActivity {
+
+    EditText etTitle, etDescription;
+    Button btnSubmitPost, btnSelectImage;
+    ImageButton btnClose;
+
+    String selectedCountry = "USA";
+    String selectedState = "PA";
+    String selectedCity = "Lancaster";
+
+    private Uri imageUri;
+    private ActivityResultLauncher<String> imagePickerLauncher;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_create_post);
+
+        etTitle = findViewById(R.id.etTitle);
+        etDescription = findViewById(R.id.etDescription);
+        btnSubmitPost = findViewById(R.id.btnSubmitPost);
+        btnSelectImage = findViewById(R.id.btnUploadImage);
+        btnClose = findViewById(R.id.btnClose);
+
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        imageUri = uri;
+                        Toast.makeText(this, "Image selected", Toast.LENGTH_SHORT).show();
+                        Log.d("CREATE_POST", "Selected URI: " + uri);
+                    }
+                }
+        );
+
+        btnSelectImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
+
+        btnClose.setOnClickListener(v -> finish());
+
+        btnSubmitPost.setOnClickListener(v -> {
+            String title = etTitle.getText().toString().trim();
+            String description = etDescription.getText().toString().trim();
+
+            if (title.isEmpty() || description.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (imageUri == null) {
+                Toast.makeText(this, "Please upload an image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            long timestamp = System.currentTimeMillis();
+
+            StorageReference ref = FirebaseStorage.getInstance()
+                    .getReference()
+                    .child("images/" + timestamp + ".jpg");
+
+            Log.d("CREATE_POST", "Uploading URI: " + imageUri);
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+
+                byte[] data = baos.toByteArray();
+
+                ref.putBytes(data)
+                        .addOnSuccessListener(taskSnapshot -> {
+                            ref.getDownloadUrl()
+                                    .addOnSuccessListener(uri -> {
+                                        String imageUrl = uri.toString();
+
+                                        Post post = new Post(
+                                                title,
+                                                description,
+                                                selectedCountry,
+                                                selectedState,
+                                                selectedCity,
+                                                imageUrl,
+                                                "test_user",
+                                                timestamp
+                                        );
+
+                                        FirebaseFirestore.getInstance()
+                                                .collection("posts")
+                                                .add(post)
+                                                .addOnSuccessListener(doc -> {
+                                                    Toast.makeText(CreatePostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("CREATE_POST", "Firestore write failed", e);
+                                                    Toast.makeText(CreatePostActivity.this, "Failed to save post: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                                });
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("CREATE_POST", "Failed to get download URL", e);
+                                        Toast.makeText(CreatePostActivity.this, "Failed to get image URL", Toast.LENGTH_LONG).show();
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("CREATE_POST", "Upload failed", e);
+                            Toast.makeText(CreatePostActivity.this, "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+
+            } catch (Exception e) {
+                Log.e("CREATE_POST", "Image processing failed", e);
+                Toast.makeText(this, "Image processing failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}

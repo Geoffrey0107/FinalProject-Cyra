@@ -74,7 +74,6 @@ public class ItineraryActivity extends AppCompatActivity {
                             saveItineraryToFirestore();
                         }
 
-
                         Toast.makeText(ItineraryActivity.this, itemToDelete + " removed", Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancel", null)
@@ -92,7 +91,7 @@ public class ItineraryActivity extends AppCompatActivity {
             startActivity(intent);
         });
         itineraryListView.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedPlace = ItineraryData.itineraryList.get(position);
+            String selectedPlace = UserSessionManager.getInstance().getItineraryList().get(position);
 
             Intent intent = new Intent(ItineraryActivity.this, ReviewActivity.class);
             intent.putExtra("place_name", selectedPlace);

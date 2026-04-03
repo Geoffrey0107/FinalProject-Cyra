@@ -1,6 +1,7 @@
 package edu.fandm.enovak.finalproject_cyra;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PostAdapter extends BaseAdapter {
 
@@ -64,8 +69,19 @@ public class PostAdapter extends BaseAdapter {
 
         btnAddPost.setOnClickListener(v -> {
             String activityName = currentPost.getTitle();
-            if (!ItineraryData.itineraryList.contains(activityName)) {
-                ItineraryData.itineraryList.add(activityName);
+//            if (!ItineraryData.itineraryList.contains(activityName)) {
+//                ItineraryData.itineraryList.add(activityName);
+//                Toast.makeText(activity, activityName + " added to itinerary", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(activity, activityName + " is already in itinerary", Toast.LENGTH_SHORT).show();
+//            }
+
+            if (!UserSessionManager.getInstance().getItineraryList().contains(activityName)) {
+                UserSessionManager.getInstance().addToItinerary(activityName);
+
+                // Save to Firestore if logged in
+                saveItineraryToFirestore();
+
                 Toast.makeText(activity, activityName + " added to itinerary", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(activity, activityName + " is already in itinerary", Toast.LENGTH_SHORT).show();
@@ -83,5 +99,22 @@ public class PostAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    private void saveItineraryToFirestore() {
+        if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = UserSessionManager.getInstance().getUserId();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("items", UserSessionManager.getInstance().getItineraryList());
+        data.put("timestamp", System.currentTimeMillis());
+
+        db.collection("itineraries")
+                .document(userId)
+                .set(data, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
+                .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
     }
 }

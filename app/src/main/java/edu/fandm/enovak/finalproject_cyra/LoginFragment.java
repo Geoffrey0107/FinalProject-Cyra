@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -108,8 +114,11 @@ public class LoginFragment extends Fragment {
 
                                                                 // this is where we would navigate to the main feed
                                                                 Intent i = new Intent(getActivity(), MainActivity.class);
-                                                                i.putExtra(MainActivity.EXTRA_USER_ID, user.getUserId());
-                                                                i.putExtra(MainActivity.EXTRA_USERNAME, user.getUsername());
+                                                                UserSessionManager.getInstance().setUserId(user.getUserId());
+                                                                UserSessionManager.getInstance().setUsername(user.getUsername());
+
+                                                                loadUserItinerary(user.getUserId());
+
                                                                 startActivity(i);
                                                             } else {
                                                                 Toast.makeText(getActivity(), "Logging in with: " + email,
@@ -144,5 +153,48 @@ public class LoginFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void loadUserItinerary(String userId) {
+        UserSessionManager.getInstance().setUserId(userId);
+        UserSessionManager.getInstance().setUsername(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("itineraries")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        ArrayList<String> savedItinerary = (ArrayList<String>) documentSnapshot.get("items");
+                        if (savedItinerary != null) {
+                            // Merge Firebase itinerary with local (anonymous) itinerary
+                            for (String place : savedItinerary) {
+                                if (!UserSessionManager.getInstance().getItineraryList().contains(place)) {
+                                    UserSessionManager.getInstance().addToItinerary(place);
+                                }
+                            }
+                        }
+                    } else {
+                        // No itinerary exists yet for this user; create empty
+                        saveItineraryToFirestore();
+                    }
+                });
+    }
+
+    private void saveItineraryToFirestore() {
+        if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = UserSessionManager.getInstance().getUserId();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("items", UserSessionManager.getInstance().getItineraryList());
+        data.put("timestamp", System.currentTimeMillis());
+
+        db.collection("itineraries")
+                .document(userId)
+                .set(data, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
+                .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
     }
 }

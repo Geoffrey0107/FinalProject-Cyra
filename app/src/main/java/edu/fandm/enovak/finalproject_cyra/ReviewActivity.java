@@ -49,7 +49,8 @@ public class ReviewActivity extends AppCompatActivity {
         visitedPlaces.add("-- Select a Place --");
 
         // add itinerary items into spinner
-        visitedPlaces.addAll(ItineraryData.itineraryList);
+//        visitedPlaces.addAll(ItineraryData.itineraryList);
+        visitedPlaces.addAll(UserSessionManager.getInstance().getItineraryList());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,

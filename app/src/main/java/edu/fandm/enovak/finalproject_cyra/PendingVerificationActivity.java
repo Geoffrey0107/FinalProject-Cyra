@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -16,6 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PendingVerificationActivity extends AppCompatActivity {
     private Button resendButton, continueButton;
@@ -72,13 +78,15 @@ public class PendingVerificationActivity extends AppCompatActivity {
                                 .get()
                                 .addOnSuccessListener(doc -> {
                                     if (!doc.exists()) { // if the user does not exist then create it
-                                        User newUser = new User(user.getUid(), username, System.currentTimeMillis(), true, null, null);
+                                        User newUser = new User(user.getUid(), username, System.currentTimeMillis(), false, null, null);
                                         db.collection("users").document(user.getUid()).set(newUser);
 
                                         // routes to main and sends user information over for profile creation
                                         Intent i = new Intent(PendingVerificationActivity.this, MainActivity.class);
-                                        i.putExtra(MainActivity.EXTRA_USER_ID, newUser.getUserId());
-                                        i.putExtra(MainActivity.EXTRA_USERNAME, newUser.getUsername());
+                                        UserSessionManager.getInstance().setUserId(newUser.getUserId());
+                                        UserSessionManager.getInstance().setUsername(newUser.getUsername());
+
+                                        loadUserItinerary(newUser.getUserId());
 
                                         // Go to MainActivity after verification
 
@@ -109,5 +117,48 @@ public class PendingVerificationActivity extends AppCompatActivity {
     private void enableResendAfterDelay() {
         // delays for 1 minute
         handler.postDelayed(() -> resendButton.setEnabled(true), 60000); // 1 min
+    }
+
+    private void loadUserItinerary(String userId) {
+        UserSessionManager.getInstance().setUserId(userId);
+        UserSessionManager.getInstance().setUsername(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("itineraries")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        ArrayList<String> savedItinerary = (ArrayList<String>) documentSnapshot.get("items");
+                        if (savedItinerary != null) {
+                            // Merge Firebase itinerary with local (anonymous) itinerary
+                            for (String place : savedItinerary) {
+                                if (!UserSessionManager.getInstance().getItineraryList().contains(place)) {
+                                    UserSessionManager.getInstance().addToItinerary(place);
+                                }
+                            }
+                        }
+                    } else {
+                        // No itinerary exists yet for this user; create empty
+                        saveItineraryToFirestore();
+                    }
+                });
+    }
+
+    private void saveItineraryToFirestore() {
+        if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = UserSessionManager.getInstance().getUserId();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("items", UserSessionManager.getInstance().getItineraryList());
+        data.put("timestamp", System.currentTimeMillis());
+
+        db.collection("itineraries")
+                .document(userId)
+                .set(data, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
+                .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
     }
 }

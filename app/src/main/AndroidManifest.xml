@@ -13,6 +13,8 @@
         android:theme="@style/Theme.FinalProjectCyra">
         <activity android:name=".PendingVerificationActivity"
             android:exported="false"/>
+        <activity android:name=".SearchActivity"
+            android:exported="false"/>
         <activity
             android:name=".CreatePostActivity"
             android:exported="false" />

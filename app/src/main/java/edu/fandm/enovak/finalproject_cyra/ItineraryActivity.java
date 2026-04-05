@@ -3,6 +3,7 @@ package edu.fandm.enovak.finalproject_cyra;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -13,6 +14,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ItineraryActivity extends AppCompatActivity {
 
@@ -37,23 +44,36 @@ public class ItineraryActivity extends AppCompatActivity {
             throw new RuntimeException("ListView not found");
         }
 
+//        adapter = new ArrayAdapter<>(
+//                this,
+//                android.R.layout.simple_list_item_1,
+//                ItineraryData.itineraryList
+//        );
+
         adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
-                ItineraryData.itineraryList
+                UserSessionManager.getInstance().getItineraryList()
         );
 
         itineraryListView.setAdapter(adapter);
 
         itineraryListView.setOnItemLongClickListener((parent, view, position, id) -> {
-            String itemToDelete = ItineraryData.itineraryList.get(position);
+//            String itemToDelete = ItineraryData.itineraryList.get(position);
+            String itemToDelete = UserSessionManager.getInstance().getItineraryList().get(position);
 
             new AlertDialog.Builder(ItineraryActivity.this)
                     .setTitle("Delete Item")
                     .setMessage("Remove \"" + itemToDelete + "\" from itinerary?")
                     .setPositiveButton("Delete", (dialog, which) -> {
-                        ItineraryData.itineraryList.remove(position);
+//                        ItineraryData.itineraryList.remove(position);
+                        UserSessionManager.getInstance().removeFromItinerary(itemToDelete);
                         adapter.notifyDataSetChanged();
+
+                        if (UserSessionManager.getInstance().isLoggedIn()) {
+                            saveItineraryToFirestore();
+                        }
+
                         Toast.makeText(ItineraryActivity.this, itemToDelete + " removed", Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancel", null)
@@ -71,7 +91,7 @@ public class ItineraryActivity extends AppCompatActivity {
             startActivity(intent);
         });
         itineraryListView.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedPlace = ItineraryData.itineraryList.get(position);
+            String selectedPlace = UserSessionManager.getInstance().getItineraryList().get(position);
 
             Intent intent = new Intent(ItineraryActivity.this, ReviewActivity.class);
             intent.putExtra("place_name", selectedPlace);
@@ -97,5 +117,22 @@ public class ItineraryActivity extends AppCompatActivity {
                 startActivity(Intent.createChooser(shareIntent, "Share via"));
             }
         });
+    }
+
+    public void saveItineraryToFirestore() {
+        if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = UserSessionManager.getInstance().getUserId();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("items", UserSessionManager.getInstance().getItineraryList());
+        data.put("timestamp", System.currentTimeMillis());
+
+        db.collection("itineraries")
+                .document(userId)
+                .set(data, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
+                .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
     }
 }

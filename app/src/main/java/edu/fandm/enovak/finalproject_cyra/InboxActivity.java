@@ -2,6 +2,7 @@ package edu.fandm.enovak.finalproject_cyra;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -15,6 +16,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 
 public class InboxActivity extends AppCompatActivity {
 
@@ -69,6 +74,14 @@ public class InboxActivity extends AppCompatActivity {
         butAddReq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // if not logged in, then do not allow
+                if (!UserSessionManager.getInstance().isLoggedIn()) {
+                    Toast.makeText(InboxActivity.this,
+                            "You must be logged in to make a request.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(InboxActivity.this);
                 builder.setTitle("Create Request");
 
@@ -106,7 +119,7 @@ public class InboxActivity extends AppCompatActivity {
                         }
 
                         // logic to save to firebase and send out request here
-
+                        saveRequestToFirestore(email, place);
 
                         dialog.dismiss(); // Close dialog after success
                     }
@@ -122,5 +135,47 @@ public class InboxActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void saveRequestToFirestore(String email, String place) {
+        if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String senderId = UserSessionManager.getInstance().getUserId();
+
+
+        // Get all itineraries
+        db.collection("itineraries")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for (DocumentSnapshot itineraryDoc : querySnapshot) {
+                        String receiverId = itineraryDoc.getId();
+
+                        // Skip sending to self
+                        if (receiverId.equals(senderId)) continue;
+
+                        // Check if itinerary contains the place
+                        ArrayList<String> places = (ArrayList<String>) itineraryDoc.get("items");
+                        if (places != null && places.contains(place)) {
+
+                            // Optional: check communications toggle if stored in itinerary
+                            db.collection("users").document(receiverId).get()
+                                .addOnSuccessListener(userDoc -> {
+                                    Boolean canCommunicate = userDoc.getBoolean("showLocation");
+
+                                    if (canCommunicate != null && canCommunicate) {
+                                        // Create and save request
+                                        Request req = new Request(place, senderId, receiverId, email, System.currentTimeMillis());
+                                        db.collection("requests")
+                                                .add(req)
+                                                .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Request sent to " + receiverId))
+                                                .addOnFailureListener(e -> Log.e("FIRESTORE", "Failed to send request", e));
+                                    }
+                                })
+                                .addOnFailureListener(e -> Log.e("FIRESTORE", "Error fetching user for communications toggle", e));
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FIRESTORE", "Error fetching itineraries", e));
     }
 }

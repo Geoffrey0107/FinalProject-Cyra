@@ -1,5 +1,6 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class UserSessionManager {
@@ -9,7 +10,8 @@ public class UserSessionManager {
     private String username;
     private ArrayList<String> itineraryList;
     private Boolean openToComms;
-
+    private ArrayList<Request> sentRequests = new ArrayList<Request>();
+    private ArrayList<Request> recRequests = new ArrayList<Request>();
     private UserSessionManager() {
         itineraryList = new ArrayList<>();
     }
@@ -38,6 +40,22 @@ public class UserSessionManager {
 
     public void setComms(Boolean status) {
         this.openToComms = status;
+    }
+
+    public void setSentRequests(ArrayList<Request> requests) {
+        this.sentRequests = requests;
+    }
+
+    public void setRecRequests(ArrayList<Request> requests) {
+        this.recRequests = requests;
+    }
+
+    public ArrayList<Request> getSentRequests() {
+        return this.sentRequests;
+    }
+
+    public ArrayList<Request> getRecRequests() {
+        return this.recRequests;
     }
 
     public void addToItinerary(String item) {

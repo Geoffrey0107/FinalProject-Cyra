@@ -62,14 +62,18 @@ public class InboxActivity extends AppCompatActivity {
 
         inboxListView.setAdapter(inboxAdapter);
 
-        loadReceivedMessages(); // loads the received messages immediately since that is the first screen
-
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
         butAddReq = findViewById(R.id.butAddRequest);
         chipGroup = findViewById(R.id.chipGroupToggle);
+
+        loadReceivedMessages(); // loads the received messages immediately since that is the first screen
+
+        setupRequestListeners(userId); // sets up listener for requests. Will delete from firebase
+        // if deleted here
+
 
         // go to itinerary
         navItinerary.setOnClickListener(new View.OnClickListener() {
@@ -175,6 +179,57 @@ public class InboxActivity extends AppCompatActivity {
                 loadSentMessages();
             }
         });
+
+        // delete requests. This will close the request on both ends
+        inboxListView.setOnItemLongClickListener((parent, view, position, id) -> {
+
+            ArrayList<Request> activeRequests;
+
+            int selectedChipId = chipGroup.getCheckedChipId();
+            if (selectedChipId == R.id.chipSent) {
+                activeRequests = new ArrayList<>(UserSessionManager.getInstance().getSentRequests());
+            } else if (selectedChipId == R.id.chipReceived) {
+                activeRequests = new ArrayList<>(UserSessionManager.getInstance().getRecRequests());
+            } else {
+                Toast.makeText(this, "Please select a tab", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            if (position >= activeRequests.size()) {
+                Toast.makeText(this, "Item not available", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            // Get the request to delete
+            Request requestToDelete = activeRequests.get(position);
+
+            // Show confirmation dialog
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete Request")
+                    .setMessage("Are you sure you want to delete this request?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        // Delete from Firestore
+                        FirebaseFirestore.getInstance()
+                                .collection("requests")
+                                .document(requestToDelete.getId())
+                                .delete()
+                                .addOnSuccessListener(aVoid ->
+                                        Toast.makeText(this, "Request deleted", Toast.LENGTH_SHORT).show()
+                                )
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(this, "Failed to delete request", Toast.LENGTH_SHORT).show()
+                                );
+
+                        // No need to remove from currentRequests — snapshot listener will update the UI
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        // Do nothing, just close the dialog
+                        dialog.dismiss();
+                    })
+                    .show();
+
+            return true;
+        });
     }
 
     public void saveRequestToFirestore(String email, String place) {
@@ -262,17 +317,53 @@ public class InboxActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load sent messages", Toast.LENGTH_SHORT).show());
     }
 
-//    private void deleteRequest() {
-//        db.collection("requests").document(msgToDelete.getId())
-//                .delete()
-//                .addOnSuccessListener(aVoid -> {
-//                    Toast.makeText(this, "Message deleted", Toast.LENGTH_SHORT).show();
-//                    // Remove from adapter
-//                    sentMessages.remove(position);
-//                    inboxAdapter.remove(inboxAdapter.getItem(position));
-//                    inboxAdapter.notifyDataSetChanged();
-//                })
-//                .addOnFailureListener(e -> Toast.makeText(this, "Failed to delete message", Toast.LENGTH_SHORT).show());
-//
-//    }
+    private void setupRequestListeners(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Received Requests
+        db.collection("requests")
+                .whereEqualTo("receiverId", userId)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("FIRESTORE", "Failed to listen for received requests", e);
+                        return;
+                    }
+
+                    ArrayList<Request> received = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                        Request r = doc.toObject(Request.class);
+                        if (r != null) r.setId(doc.getId());
+                        received.add(r);
+                    }
+                    UserSessionManager.getInstance().setRecRequests(received);
+
+                    // If "Received" is selected, refresh list
+                    if (chipGroup.getCheckedChipId() == R.id.chipReceived) {
+                        loadReceivedMessages();
+                    }
+                });
+
+        // Sent Requests
+        db.collection("requests")
+                .whereEqualTo("senderId", userId)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("FIRESTORE", "Failed to listen for sent requests", e);
+                        return;
+                    }
+
+                    ArrayList<Request> sent = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                        Request r = doc.toObject(Request.class);
+                        if (r != null) r.setId(doc.getId());
+                        sent.add(r);
+                    }
+                    UserSessionManager.getInstance().setSentRequests(sent);
+
+                    // If "Sent" is selected, refresh list
+                    if (chipGroup.getCheckedChipId() == R.id.chipSent) {
+                        loadSentMessages();
+                    }
+                });
+    }
 }

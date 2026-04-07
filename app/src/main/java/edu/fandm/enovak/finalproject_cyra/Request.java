@@ -14,6 +14,7 @@ public class Request {
     private long timestamp;
     // was request accepted or rejected
     private boolean handled;
+    private String id;
 
     // Default constructor required for Firebase
     public Request() {
@@ -21,6 +22,17 @@ public class Request {
     }
 
     public Request(String place, String senderId, String receiverId, String email, long timestamp) {
+        this.id = "";
+        this.place = place;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.email = email;
+        this.timestamp = timestamp;
+        this.handled = false;
+    }
+
+    public Request(String id, String place, String senderId, String receiverId, String email, long timestamp) {
+        this.id = id;
         this.place = place;
         this.senderId = senderId;
         this.receiverId = receiverId;
@@ -70,6 +82,14 @@ public class Request {
     }
     public void setHandled(boolean handled) {
         this.handled = handled;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     @Override

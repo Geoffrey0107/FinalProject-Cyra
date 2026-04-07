@@ -28,7 +28,7 @@ public class CreatePostActivity extends AppCompatActivity {
     EditText etTitle, etDescription, etCountry,etState,etCity ;
     Button btnSubmitPost, btnSelectImage;
 
-    LinearLayout navActivity, navItinerary, navPost;
+    LinearLayout navActivity, navItinerary, navPost,navSearch,navChat;
 
     private Uri imageUri;
     private ActivityResultLauncher<String> imagePickerLauncher;
@@ -41,6 +41,7 @@ public class CreatePostActivity extends AppCompatActivity {
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+        navSearch = findViewById(R.id.navSearch);
 
         etCountry = findViewById(R.id.etCountry);
         etState = findViewById(R.id.etState);
@@ -74,6 +75,13 @@ public class CreatePostActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(CreatePostActivity.this, ItineraryActivity.class);
+                startActivity(intent);
+            }
+        });
+        navSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CreatePostActivity.this, SearchActivity.class);
                 startActivity(intent);
             }
         });

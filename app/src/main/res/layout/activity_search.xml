@@ -71,15 +71,16 @@
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
         android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center"
         android:background="#FFFFFF"
         android:elevation="8dp"
-        android:gravity="center"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
+            android:id="@+id/navChat"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -115,6 +116,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navPost"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -123,6 +125,24 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:src="@drawable/postitem" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Post"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
                 android:src="@drawable/outline_search_24" />
             <TextView
                 android:layout_width="wrap_content"

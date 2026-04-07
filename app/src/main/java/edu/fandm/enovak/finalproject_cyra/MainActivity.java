@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     Button testBut;
-    ImageButton btnAdd1, btnAdd2;
+    ImageButton btnAdd1, btnAdd2,btnProfile,btnMore;
     LinearLayout navActivity, navItinerary, navPost, navSearch;
 
     String selectedCountry = "USA";
@@ -58,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
         tvTopLocation.setOnClickListener(v -> showLocationDialog());
 
-        //btnAdd1 = findViewById(R.id.btnAdd1);
-        //btnAdd2 = findViewById(R.id.btnAdd2);
+        btnProfile = findViewById(R.id.btnProfile);
+        btnMore = findViewById(R.id.btnMore);
+
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
@@ -78,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
         btnMore = findViewById(R.id.btnMore);
         btnMore.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
+        btnProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
             startActivity(intent);
         });
 

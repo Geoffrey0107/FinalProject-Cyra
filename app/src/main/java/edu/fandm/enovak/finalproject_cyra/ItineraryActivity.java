@@ -26,7 +26,7 @@ public class ItineraryActivity extends AppCompatActivity {
     ListView itineraryListView;
     ArrayAdapter<String> adapter;
 
-    LinearLayout navActivity, navItinerary, navPost;
+    LinearLayout navActivity, navItinerary, navPost,navSearch;
 
 
     @Override
@@ -37,13 +37,13 @@ public class ItineraryActivity extends AppCompatActivity {
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+        navSearch = findViewById(R.id.navSearch);
         itineraryListView = findViewById(R.id.itineraryListView);
         ImageButton btnShare = findViewById(R.id.share_button);
 
         if (itineraryListView == null) {
             throw new RuntimeException("ListView not found");
         }
-
 //        adapter = new ArrayAdapter<>(
 //                this,
 //                android.R.layout.simple_list_item_1,
@@ -87,6 +87,11 @@ public class ItineraryActivity extends AppCompatActivity {
         });
         navPost.setOnClickListener(v -> {
             Intent intent = new Intent(ItineraryActivity.this, CreatePostActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        navSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(ItineraryActivity.this, SearchActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });

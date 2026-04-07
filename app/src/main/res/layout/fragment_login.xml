@@ -35,6 +35,14 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#1B6B1B"/>
 
+    <Button
+        android:id="@+id/reset_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reset Password"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1B6B1B"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/back_button_login"
         android:layout_width="56dp"

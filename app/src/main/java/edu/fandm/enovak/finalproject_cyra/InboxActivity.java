@@ -207,8 +207,17 @@ public class InboxActivity extends AppCompatActivity {
                                         // Create and save request
                                         Request req = new Request(place, senderId, receiverId, email, System.currentTimeMillis());
                                         db.collection("requests")
-                                                .add(req)
-                                                .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Request sent to " + receiverId))
+                                            .add(req)
+                                            .addOnSuccessListener(documentReference -> {
+                                                String generatedId = documentReference.getId();
+
+                                                // Update the document with its own ID
+                                                documentReference.update("id", generatedId)
+                                                    .addOnSuccessListener(aVoid ->
+                                                            Log.d("FIRESTORE", "Request saved with ID field: " + generatedId))
+                                                    .addOnFailureListener(e ->
+                                                            Log.e("FIRESTORE", "Failed to add ID field", e));
+                                            })
                                                 .addOnFailureListener(e -> Log.e("FIRESTORE", "Failed to send request", e));
                                     }
                                 })
@@ -252,4 +261,18 @@ public class InboxActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load sent messages", Toast.LENGTH_SHORT).show());
     }
+
+//    private void deleteRequest() {
+//        db.collection("requests").document(msgToDelete.getId())
+//                .delete()
+//                .addOnSuccessListener(aVoid -> {
+//                    Toast.makeText(this, "Message deleted", Toast.LENGTH_SHORT).show();
+//                    // Remove from adapter
+//                    sentMessages.remove(position);
+//                    inboxAdapter.remove(inboxAdapter.getItem(position));
+//                    inboxAdapter.notifyDataSetChanged();
+//                })
+//                .addOnFailureListener(e -> Toast.makeText(this, "Failed to delete message", Toast.LENGTH_SHORT).show());
+//
+//    }
 }

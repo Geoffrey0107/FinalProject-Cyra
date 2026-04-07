@@ -71,4 +71,9 @@ public class Request {
     public void setHandled(boolean handled) {
         this.handled = handled;
     }
+
+    @Override
+    public String toString() {
+        return "Email: " + this.email + "\nPlace: " + place;
+    }
 }

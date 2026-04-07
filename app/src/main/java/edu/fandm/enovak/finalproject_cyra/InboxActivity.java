@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -20,14 +22,20 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class InboxActivity extends AppCompatActivity {
 
     LinearLayout navActivity, navItinerary, navPost, navSearch;
+    ListView inboxListView;
+    ArrayAdapter<String> inboxAdapter;
     FloatingActionButton butAddReq;
     ChipGroup chipGroup;
+    FirebaseFirestore db;
+    String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,22 @@ public class InboxActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        db = FirebaseFirestore.getInstance();
+
+        userId = UserSessionManager.getInstance().getUserId();
+
+        inboxListView = findViewById(R.id.inboxListView);
+
+        inboxAdapter = new ArrayAdapter<>(
+            this, // Context
+            android.R.layout.simple_list_item_1, // Built-in layout (TextView)
+            new ArrayList<>() // Empty list initially
+        );
+
+        inboxListView.setAdapter(inboxAdapter);
+
+        loadReceivedMessages(); // loads the received messages immediately since that is the first screen
 
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
@@ -145,10 +169,10 @@ public class InboxActivity extends AppCompatActivity {
             int checkedId = checkedIds.get(0); // singleSelection ensures only one
             if (checkedId == R.id.chipReceived) {
                 // Load received messages
-                // loadReceivedMessages();
+                loadReceivedMessages();
             } else if (checkedId == R.id.chipSent) {
                 // Load sent messages
-                // loadSentMessages();
+                loadSentMessages();
             }
         });
     }
@@ -193,5 +217,39 @@ public class InboxActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> Log.e("FIRESTORE", "Error fetching itineraries", e));
+    }
+
+    private void loadReceivedMessages() {
+        db.collection("requests")
+                .whereEqualTo("receiverId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<String> receivedMessages = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Request msg = doc.toObject(Request.class);
+                        receivedMessages.add(msg.toString());
+                    }
+                    inboxAdapter.clear();
+                    inboxAdapter.addAll(receivedMessages);
+                    inboxAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load received messages", Toast.LENGTH_SHORT).show());
+    }
+
+    private void loadSentMessages() {
+        db.collection("requests")
+                .whereEqualTo("senderId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<String> sentMessages = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Request msg = doc.toObject(Request.class);
+                        sentMessages.add(msg.toString());
+                    }
+                    inboxAdapter.clear();
+                    inboxAdapter.addAll(sentMessages);
+                    inboxAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load sent messages", Toast.LENGTH_SHORT).show());
     }
 }

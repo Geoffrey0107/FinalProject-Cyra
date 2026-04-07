@@ -85,6 +85,7 @@ public class PendingVerificationActivity extends AppCompatActivity {
                                         Intent i = new Intent(PendingVerificationActivity.this, MainActivity.class);
                                         UserSessionManager.getInstance().setUserId(newUser.getUserId());
                                         UserSessionManager.getInstance().setUsername(newUser.getUsername());
+                                        UserSessionManager.getInstance().setComms(newUser.isShowLocation());
 
                                         loadUserItinerary(newUser.getUserId());
 

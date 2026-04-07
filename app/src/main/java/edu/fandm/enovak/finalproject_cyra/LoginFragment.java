@@ -116,6 +116,7 @@ public class LoginFragment extends Fragment {
                                                                 Intent i = new Intent(getActivity(), MainActivity.class);
                                                                 UserSessionManager.getInstance().setUserId(user.getUserId());
                                                                 UserSessionManager.getInstance().setUsername(user.getUsername());
+                                                                UserSessionManager.getInstance().setComms(user.isShowLocation());
 
                                                                 loadUserItinerary(user.getUserId());
 

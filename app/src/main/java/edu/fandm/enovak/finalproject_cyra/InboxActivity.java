@@ -15,6 +15,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,6 +27,7 @@ public class InboxActivity extends AppCompatActivity {
 
     LinearLayout navActivity, navItinerary, navPost, navSearch;
     FloatingActionButton butAddReq;
+    ChipGroup chipGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class InboxActivity extends AppCompatActivity {
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
         butAddReq = findViewById(R.id.butAddRequest);
+        chipGroup = findViewById(R.id.chipGroupToggle);
 
         // go to itinerary
         navItinerary.setOnClickListener(new View.OnClickListener() {
@@ -135,6 +139,18 @@ public class InboxActivity extends AppCompatActivity {
             }
         });
 
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return; // No chip selected, do nothing
+
+            int checkedId = checkedIds.get(0); // singleSelection ensures only one
+            if (checkedId == R.id.chipReceived) {
+                // Load received messages
+                // loadReceivedMessages();
+            } else if (checkedId == R.id.chipSent) {
+                // Load sent messages
+                // loadSentMessages();
+            }
+        });
     }
 
     public void saveRequestToFirestore(String email, String place) {

@@ -32,6 +32,9 @@
             android:exported="false" />
         <activity android:name=".ItineraryActivity" />
         <activity
+            android:name=".InboxActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

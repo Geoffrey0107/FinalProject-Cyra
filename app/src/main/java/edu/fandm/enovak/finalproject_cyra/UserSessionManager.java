@@ -8,6 +8,7 @@ public class UserSessionManager {
     private String userId; // null if not logged in
     private String username;
     private ArrayList<String> itineraryList;
+    private Boolean openToComms;
 
     private UserSessionManager() {
         itineraryList = new ArrayList<>();
@@ -30,6 +31,14 @@ public class UserSessionManager {
 
     public ArrayList<String> getItineraryList() { return itineraryList; }
     public void setItineraryList(ArrayList<String> list) { this.itineraryList = list; }
+
+    public boolean getCommsStatus() {
+        return this.openToComms;
+    }
+
+    public void setComms(Boolean status) {
+        this.openToComms = status;
+    }
 
     public void addToItinerary(String item) {
         if (!itineraryList.contains(item)) {

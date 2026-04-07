@@ -63,6 +63,8 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
+
+
         <TextView
             android:id="@+id/tvPostDesc"
             android:layout_width="match_parent"
@@ -70,7 +72,9 @@
             android:layout_marginTop="6dp"
             android:text="Post description"
             android:textColor="#475569"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end" />
 
     </LinearLayout>
 

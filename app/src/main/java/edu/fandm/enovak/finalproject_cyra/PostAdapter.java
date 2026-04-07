@@ -1,6 +1,7 @@
 package edu.fandm.enovak.finalproject_cyra;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,19 @@ public class PostAdapter extends BaseAdapter {
 
         TextView tvPostTitle = convertView.findViewById(R.id.tvPostTitle);
         TextView tvPostDesc = convertView.findViewById(R.id.tvPostDesc);
+
+        tvPostTitle.setText(currentPost.getTitle());
+
+        String fullDescription = currentPost.getDescription();
+        String shortDescription;
+
+        if (fullDescription != null && fullDescription.length() > 20) {
+            shortDescription = fullDescription.substring(0, 20) + "...";
+        } else {
+            shortDescription = fullDescription;
+        }
+
+        tvPostDesc.setText(shortDescription);
         ImageView imageView = convertView.findViewById(R.id.postImage);
         ImageButton btnAddPost = convertView.findViewById(R.id.btnAddPost);
         ImageButton btnLikePost = convertView.findViewById(R.id.btnLikePost);
@@ -96,6 +110,17 @@ public class PostAdapter extends BaseAdapter {
             postList.remove(position);
             notifyDataSetChanged();
             Toast.makeText(activity, "Removed " + currentPost.getTitle(), Toast.LENGTH_SHORT).show();
+        });
+
+        convertView.setOnClickListener(v -> {
+            Intent intent = new Intent(activity, PlaceDetails.class);
+            intent.putExtra("place_title", currentPost.getTitle());
+            intent.putExtra("place_description", currentPost.getDescription());
+            intent.putExtra("place_image_url", currentPost.getImageUrl());
+            intent.putExtra("place_country", currentPost.getCountry());
+            intent.putExtra("place_state", currentPost.getState());
+            intent.putExtra("place_city", currentPost.getCity());
+            activity.startActivity(intent);
         });
 
         return convertView;

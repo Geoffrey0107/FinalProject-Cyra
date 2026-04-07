@@ -2,7 +2,6 @@ package edu.fandm.enovak.finalproject_cyra;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +32,6 @@ public class ReviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
 
-
         spinnerPlaces = findViewById(R.id.spinner_places);
         ratingBar = findViewById(R.id.rating_bar);
         tvRatingValue = findViewById(R.id.tv_rating_value);
@@ -42,30 +40,29 @@ public class ReviewActivity extends AppCompatActivity {
         tvReviewTitle = findViewById(R.id.tv_review_title);
         navActivity = findViewById(R.id.navActivity);
 
-
-        String selectedPlaceFromItinerary = getIntent().getStringExtra("place_name");
+        String selectedPlace = getIntent().getStringExtra("place_name");
 
         List<String> visitedPlaces = new ArrayList<>();
         visitedPlaces.add("-- Select a Place --");
+        visitedPlaces.addAll(ItineraryData.itineraryList);
 
-        // add itinerary items into spinner
-//        visitedPlaces.addAll(ItineraryData.itineraryList);
-        visitedPlaces.addAll(UserSessionManager.getInstance().getItineraryList());
+        if (selectedPlace != null && !visitedPlaces.contains(selectedPlace)) {
+            visitedPlaces.add(selectedPlace);
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
                 visitedPlaces
         );
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPlaces.setAdapter(adapter);
 
-        // preselect the tapped place if it exists
-        if (selectedPlaceFromItinerary != null) {
-            int position = visitedPlaces.indexOf(selectedPlaceFromItinerary);
+        if (selectedPlace != null) {
+            int position = visitedPlaces.indexOf(selectedPlace);
             if (position >= 0) {
                 spinnerPlaces.setSelection(position);
-                tvReviewTitle.setText("Review: " + selectedPlaceFromItinerary);
             }
         }
 
@@ -73,6 +70,7 @@ public class ReviewActivity extends AppCompatActivity {
             int intRating = (int) rating;
             tvRatingValue.setText(intRating + " / 5 Stars");
         });
+
         navActivity.setOnClickListener(v -> {
             Intent intent = new Intent(ReviewActivity.this, MainActivity.class);
             startActivity(intent);
@@ -102,10 +100,19 @@ public class ReviewActivity extends AppCompatActivity {
             return;
         }
 
-        String summary = "Review Submitted for " + selectedPlace + "\n" +
-                "Rating: " + starRating + " Stars\n" +
-                "Review: \"" + reviewText + "\"";
+        long timestamp = System.currentTimeMillis();
 
-        Toast.makeText(this, summary, Toast.LENGTH_LONG).show();
+        Review review = new Review(selectedPlace, starRating, reviewText, timestamp);
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("reviews")
+                .add(review)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Review submitted successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to submit review", Toast.LENGTH_SHORT).show();
+                });
     }
 }

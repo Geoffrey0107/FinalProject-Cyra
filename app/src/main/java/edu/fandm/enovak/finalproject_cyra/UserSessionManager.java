@@ -40,4 +40,12 @@ public class UserSessionManager {
     public void removeFromItinerary(String item) {
         itineraryList.remove(item);
     }
+
+    // clears session when logging out
+    public void clear() {
+        userId = null;
+        username = null;
+        itineraryList.clear();
+        instance = null;
+    }
 }

@@ -72,6 +72,19 @@
                 android:padding="12dp"/>
 
             <Button
+                android:id="@+id/logOutBut"
+                android:layout_width="250dp"
+                android:layout_height="60dp"
+                android:text="Logout"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/forest_green_dark"
+                android:elevation="6dp"
+                android:layout_marginBottom="20dp"
+                android:textAllCaps="false"
+                android:padding="12dp"/>
+
+
+            <Button
                 android:id="@+id/about_cyra_but"
                 android:layout_width="250dp"
                 android:layout_height="60dp"

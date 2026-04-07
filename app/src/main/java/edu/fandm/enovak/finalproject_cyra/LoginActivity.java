@@ -1,5 +1,6 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +18,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBut;
     private Button registerBut;
     private Button aboutCyraBut;
+    private Button logOut;
 
 
     @Override
@@ -33,6 +35,18 @@ public class LoginActivity extends AppCompatActivity {
         loginBut = (Button) findViewById(R.id.loginBut);
         registerBut = (Button) findViewById(R.id.registerBut);
         aboutCyraBut = (Button) findViewById(R.id.about_cyra_but);
+        logOut = (Button) findViewById(R.id.logOutBut);
+
+        // if not logged in, hide log out button
+        if (!UserSessionManager.getInstance().isLoggedIn()) {
+            logOut.setVisibility(View.GONE);
+            registerBut.setVisibility(View.VISIBLE);
+            loginBut.setVisibility(View.VISIBLE);
+        } else { // hide other buttons otherwise
+            registerBut.setVisibility(View.GONE);
+            loginBut.setVisibility(View.GONE);
+            logOut.setVisibility(View.VISIBLE);
+        }
 
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +59,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadFragment(new RegisterFragment());
+            }
+        });
+
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // clears user session then goes back to main
+                UserSessionManager.getInstance().clear();
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(i);
             }
         });
 

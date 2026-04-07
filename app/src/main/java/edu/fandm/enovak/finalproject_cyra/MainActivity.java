@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout navActivity, navItinerary, navPost, navSearch, navChat;
 
     String selectedCountry = "USA";
-    String selectedState = "PA";
-    String selectedCity = "Lancaster";
+    String selectedState = "NY";
+    String selectedCity = "New York";
     TextView tvTopLocation;
 
     ArrayList<Post> postList;
@@ -54,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tvTopLocation = findViewById(R.id.tvTopLocation);
-
         tvTopLocation.setText(selectedCity);
+
+        tvTopLocation.setOnClickListener(v -> showLocationDialog());
 
         //btnAdd1 = findViewById(R.id.btnAdd1);
         //btnAdd2 = findViewById(R.id.btnAdd2);
@@ -181,5 +182,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadPosts();
+    }
+
+    private void showLocationDialog() {
+        String[] locations = {
+                "Lancaster, PA, USA",
+                "Philadelphia, PA, USA",
+                "New York, NY, USA",
+        };
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Select Location")
+                .setItems(locations, (dialog, which) -> {
+                    String selected = locations[which];
+
+                    String[] parts = selected.split(", ");
+                    if (parts.length == 3) {
+                        selectedCity = parts[0];
+                        selectedState = parts[1];
+                        selectedCountry = parts[2];
+                    }
+
+                    tvTopLocation.setText(selectedCity);
+                    loadPosts();
+                })
+                .show();
     }
 }

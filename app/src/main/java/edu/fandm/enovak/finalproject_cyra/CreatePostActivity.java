@@ -25,14 +25,10 @@ import java.io.ByteArrayOutputStream;
 
 public class CreatePostActivity extends AppCompatActivity {
 
-    EditText etTitle, etDescription;
+    EditText etTitle, etDescription, etCountry,etState,etCity ;
     Button btnSubmitPost, btnSelectImage;
 
     LinearLayout navActivity, navItinerary, navPost;
-
-    String selectedCountry = "USA";
-    String selectedState = "PA";
-    String selectedCity = "Lancaster";
 
     private Uri imageUri;
     private ActivityResultLauncher<String> imagePickerLauncher;
@@ -45,6 +41,10 @@ public class CreatePostActivity extends AppCompatActivity {
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+
+        etCountry = findViewById(R.id.etCountry);
+        etState = findViewById(R.id.etState);
+        etCity = findViewById(R.id.etCity);
 
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
@@ -82,6 +82,10 @@ public class CreatePostActivity extends AppCompatActivity {
             String title = etTitle.getText().toString().trim();
             String description = etDescription.getText().toString().trim();
 
+            String country = etCountry.getText().toString().trim();
+            String state = etState.getText().toString().trim();
+            String city = etCity.getText().toString().trim();
+
             if (title.isEmpty() || description.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
@@ -117,9 +121,9 @@ public class CreatePostActivity extends AppCompatActivity {
                                         Post post = new Post(
                                                 title,
                                                 description,
-                                                selectedCountry,
-                                                selectedState,
-                                                selectedCity,
+                                                country,
+                                                state,
+                                                city,
                                                 imageUrl,
                                                 "test_user",
                                                 timestamp

@@ -13,6 +13,8 @@
         android:theme="@style/Theme.FinalProjectCyra">
         <activity android:name=".PendingVerificationActivity"
             android:exported="false"/>
+        <activity android:name=".SearchActivity"
+            android:exported="false"/>
         <activity
             android:name=".SearchActivity"
             android:exported="false" />
@@ -26,7 +28,7 @@
             android:name=".ReviewActivity"
             android:exported="false" />
         <activity
-            android:name=".TestLoginActivity"
+            android:name=".SearchActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

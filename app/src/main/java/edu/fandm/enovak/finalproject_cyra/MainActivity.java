@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     Button testBut;
-    ImageButton btnAdd1, btnAdd2;
+    ImageButton btnAdd1, btnAdd2, btnProfile, btnMore; // Added btnProfile here
     LinearLayout navActivity, navItinerary, navPost, navSearch;
 
     String selectedCountry = "USA";
@@ -53,53 +52,38 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Initialize UI Elements
         tvTopLocation = findViewById(R.id.tvTopLocation);
-
         tvTopLocation.setText(selectedCity);
 
-        //btnAdd1 = findViewById(R.id.btnAdd1);
-        //btnAdd2 = findViewById(R.id.btnAdd2);
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
+        btnProfile = findViewById(R.id.btnProfile); // Link to your person icon
+        btnMore = findViewById(R.id.btnMore);
 
         placesListView = findViewById(R.id.placesListView);
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(this, postList);
         placesListView.setAdapter(postAdapter);
 
-        loadPosts();
+        // --- NAVIGATION LOGIC ---
 
-        ImageButton btnProfile, btnMore;
+        // NEW: Open User Profile when clicking the person icon
+        btnProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+            startActivity(intent);
+        });
 
-        btnProfile = findViewById(R.id.btnProfile);
-        btnMore = findViewById(R.id.btnMore);
         btnMore.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         });
 
-//        btnAdd1.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                addToItinerary("Central Market");
-//            }
-//        });
-//
-//        btnAdd2.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                addToItinerary("River Trail Walk");
-//            }
-//        });
-
-        navItinerary.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ItineraryActivity.class);
-                startActivity(intent);
-            }
+        navItinerary.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, ItineraryActivity.class);
+            startActivity(intent);
         });
 
         navPost.setOnClickListener(v -> {
@@ -112,40 +96,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("posts")
-                .whereEqualTo("country", "USA")
-                .whereEqualTo("state", "PA")
-                .whereEqualTo("city", "Lancaster")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Log.d("FIRESTORE", "Loaded posts: " + postList.size());
-                    postList.clear();
-
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        Post post = doc.toObject(Post.class);
-                        if (post != null) {
-                            postList.add(post);
-                            Log.d("FIRESTORE", "Post title: " + post.getTitle());
-                        }
-                    }
-
-                    postAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
-                });
+        // Initial Load
+        loadPosts();
     }
 
-    private void addToItinerary(String activityName) {
-        if (!ItineraryData.itineraryList.contains(activityName)) {
-            ItineraryData.itineraryList.add(activityName);
-            Toast.makeText(MainActivity.this, activityName + " added to itinerary", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(MainActivity.this, activityName + " is already in itinerary", Toast.LENGTH_SHORT).show();
-        }
-    }
     private void loadPosts() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -156,15 +110,14 @@ public class MainActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     postList.clear();
-
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Post post = doc.toObject(Post.class);
                         if (post != null) {
                             postList.add(post);
                         }
                     }
-
                     postAdapter.notifyDataSetChanged();
+                    Log.d("FIRESTORE", "Loaded posts: " + postList.size());
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
@@ -174,6 +127,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadPosts();
+        loadPosts(); // Refresh feed when returning to main screen
     }
 }

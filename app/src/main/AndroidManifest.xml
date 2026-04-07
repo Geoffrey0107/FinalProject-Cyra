@@ -11,33 +11,48 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProjectCyra">
-        <activity android:name=".PendingVerificationActivity"
+
+        <activity
+            android:name=".UserProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".PendingVerificationActivity"
             android:exported="false"/>
+
         <activity
             android:name=".CreatePostActivity"
             android:exported="false" />
+
         <activity
             android:name=".PlaceDetails"
             android:exported="false" />
+
         <activity
             android:name=".ReviewActivity"
             android:exported="false" />
+
         <activity
             android:name=".TestLoginActivity"
             android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
-        <activity android:name=".ItineraryActivity" />
+
+        <activity
+            android:name=".ItineraryActivity"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
 
 import androidx.activity.EdgeToEdge;
@@ -70,6 +72,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // clears user session then goes back to main
                 UserSessionManager.getInstance().clear();
+                Toast.makeText(LoginActivity.this, "Successfully Logged out.",
+                        Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(i);
             }

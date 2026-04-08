@@ -33,6 +33,8 @@ public class CreatePostActivity extends AppCompatActivity {
     private Uri imageUri;
     private ActivityResultLauncher<String> imagePickerLauncher;
 
+    private String username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +53,8 @@ public class CreatePostActivity extends AppCompatActivity {
         etDescription = findViewById(R.id.etDescription);
         btnSubmitPost = findViewById(R.id.btnSubmitPost);
         btnSelectImage = findViewById(R.id.btnUploadImage);
+
+        username = UserSessionManager.getInstance().getUsername();
 
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
@@ -133,7 +137,7 @@ public class CreatePostActivity extends AppCompatActivity {
                                                 state,
                                                 city,
                                                 imageUrl,
-                                                "test_user",
+                                                username,
                                                 timestamp
                                         );
 

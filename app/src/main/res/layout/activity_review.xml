@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+    android:padding="10dp"
     android:background="@color/white"
     tools:context=".ReviewActivity">
 
@@ -119,7 +119,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="16dp" />
-    <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -173,8 +172,8 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Search -->
         <LinearLayout
+            android:id="@+id/navPost"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -184,6 +183,28 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:src="@drawable/postitem" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Post"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Search -->
+        <LinearLayout
+            android:id="@+id/navSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@drawable/outline_search_24" />
 
             <TextView
@@ -191,9 +212,10 @@
                 android:layout_height="wrap_content"
                 android:text="Search"
                 android:textSize="12sp" />
+
         </LinearLayout>
 
-        <!-- Itinerary -->
+        <!-- Itinerary (active) -->
         <LinearLayout
             android:id="@+id/navItinerary"
             android:layout_width="0dp"
@@ -212,6 +234,7 @@
                 android:layout_height="wrap_content"
                 android:text="Itinerary"
                 android:textSize="12sp" />
+
         </LinearLayout>
 
     </LinearLayout>

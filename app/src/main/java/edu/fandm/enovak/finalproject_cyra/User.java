@@ -9,7 +9,7 @@ public class User {
     private String userId;
     private String username;
     private long timeCreated;
-    private boolean showLocation;
+    private boolean showLocation; // NOTE: This should be changed to canCommunicate. Right now, that's how this functions
     private String profilePicture; // URL or null
     private String description;
 

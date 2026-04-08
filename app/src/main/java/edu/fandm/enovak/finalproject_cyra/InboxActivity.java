@@ -232,6 +232,7 @@ public class InboxActivity extends AppCompatActivity {
         });
     }
 
+    // saves the request to firestore
     public void saveRequestToFirestore(String email, String place) {
         if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
 
@@ -244,7 +245,7 @@ public class InboxActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     for (DocumentSnapshot itineraryDoc : querySnapshot) {
-                        String receiverId = itineraryDoc.getId();
+                        String receiverId = itineraryDoc.getId(); // gets the id of the receiver
 
                         // Skip sending to self
                         if (receiverId.equals(senderId)) continue;
@@ -253,7 +254,7 @@ public class InboxActivity extends AppCompatActivity {
                         ArrayList<String> places = (ArrayList<String>) itineraryDoc.get("items");
                         if (places != null && places.contains(place)) {
 
-                            // Optional: check communications toggle if stored in itinerary
+                            // check communications toggle
                             db.collection("users").document(receiverId).get()
                                 .addOnSuccessListener(userDoc -> {
                                     Boolean canCommunicate = userDoc.getBoolean("showLocation");
@@ -283,16 +284,18 @@ public class InboxActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("FIRESTORE", "Error fetching itineraries", e));
     }
 
+    // loads received messages
     private void loadReceivedMessages() {
         db.collection("requests")
                 .whereEqualTo("receiverId", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<String> receivedMessages = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) { // puts each doc (toString()) into array
                         Request msg = doc.toObject(Request.class);
                         receivedMessages.add(msg.toString());
                     }
+                    // updates adapter
                     inboxAdapter.clear();
                     inboxAdapter.addAll(receivedMessages);
                     inboxAdapter.notifyDataSetChanged();
@@ -300,16 +303,18 @@ public class InboxActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load received messages", Toast.LENGTH_SHORT).show());
     }
 
+    // loads the sent messages the current user has made
     private void loadSentMessages() {
         db.collection("requests")
                 .whereEqualTo("senderId", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<String> sentMessages = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) { // loads each doc and adds it to an array list
                         Request msg = doc.toObject(Request.class);
                         sentMessages.add(msg.toString());
                     }
+                    // updates adapter
                     inboxAdapter.clear();
                     inboxAdapter.addAll(sentMessages);
                     inboxAdapter.notifyDataSetChanged();
@@ -317,6 +322,8 @@ public class InboxActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load sent messages", Toast.LENGTH_SHORT).show());
     }
 
+    // sets up listener for request so when one is deleted, it communicates with the firebase immediately
+    // and deletes the request
     private void setupRequestListeners(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -332,7 +339,7 @@ public class InboxActivity extends AppCompatActivity {
                     ArrayList<Request> received = new ArrayList<>();
                     for (DocumentSnapshot doc : snapshots.getDocuments()) {
                         Request r = doc.toObject(Request.class);
-                        if (r != null) r.setId(doc.getId());
+                        if (r != null) r.setId(doc.getId()); // sets the Id field to the doc Id
                         received.add(r);
                     }
                     UserSessionManager.getInstance().setRecRequests(received);

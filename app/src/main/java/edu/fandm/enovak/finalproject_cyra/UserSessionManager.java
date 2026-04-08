@@ -35,7 +35,10 @@ public class UserSessionManager {
     public void setItineraryList(ArrayList<String> list) { this.itineraryList = list; }
 
     public boolean getCommsStatus() {
-        return this.openToComms;
+        if (this.openToComms == null) {
+            return false; // default value if not yet set
+        }
+        return this.openToComms; // auto-unboxes Boolean to boolean safely
     }
 
     public void setComms(Boolean status) {

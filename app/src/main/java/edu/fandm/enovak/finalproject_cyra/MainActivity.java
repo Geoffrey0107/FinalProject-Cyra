@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -29,16 +30,19 @@ public class MainActivity extends AppCompatActivity {
     ImageButton btnAdd1, btnAdd2,btnProfile,btnMore;
     LinearLayout navActivity, navItinerary, navPost, navSearch, navChat;
 
+    SwitchCompat connectionToggle;
+
     String selectedCountry = "USA";
     String selectedState = "NY";
     String selectedCity = "New York";
-    TextView tvTopLocation;
+    TextView tvTopLocation, tvConnectionLabel;
 
     ArrayList<Post> postList;
     PostAdapter postAdapter;
     ListView placesListView;
-    public static final String EXTRA_USER_ID = "extra_user_id";
-    public static final String EXTRA_USERNAME = "extra_username";
+
+    Boolean isConnectionMode = false;
+    private String userId;
 
 
     @Override
@@ -57,9 +61,11 @@ public class MainActivity extends AppCompatActivity {
         tvTopLocation.setText(selectedCity);
 
         tvTopLocation.setOnClickListener(v -> showLocationDialog());
+        tvConnectionLabel = findViewById(R.id.tvConnectionLabel);
 
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);
+        connectionToggle = findViewById(R.id.switchConnectionMode);
 
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
@@ -75,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
         loadPosts();
 
         ImageButton btnProfile, btnMore;
+
+        userId = UserSessionManager.getInstance().getUserId();
 
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);
@@ -148,6 +156,56 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
                 });
+
+        // initial state setup
+        isConnectionMode = UserSessionManager.getInstance().getCommsStatus();
+
+        if (!isConnectionMode) {
+            navChat.setVisibility(View.INVISIBLE);
+        } else {
+            navChat.setVisibility(View.VISIBLE);
+        }
+
+        connectionToggle.setChecked(isConnectionMode);
+        tvConnectionLabel.setText(isConnectionMode ? "On" : "Off");
+
+        connectionToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            // checks if user is logged in.
+            // will not allow user to use connection mode if not logged in
+            if (!UserSessionManager.getInstance().isLoggedIn()) {
+                connectionToggle.setEnabled(false); // disables toggle
+                Toast.makeText(MainActivity.this, "Must be logged in to use connection mode",
+                        Toast.LENGTH_LONG).show();
+                return;
+            } else {
+                connectionToggle.setEnabled(true);
+            }
+
+            if (isChecked) {
+                // ON
+                tvConnectionLabel.setText("On");
+                Toast.makeText(this, "Connection Mode ON", Toast.LENGTH_SHORT).show();
+
+                navChat.setVisibility(View.VISIBLE);
+            } else {
+                // OFF
+                tvConnectionLabel.setText("Off");
+                Toast.makeText(this, "Connection Mode OFF", Toast.LENGTH_SHORT).show();
+
+                navChat.setVisibility(View.INVISIBLE);
+            }
+
+            db.collection("users")
+                .document(userId)
+                .update("showLocation", isChecked)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to update", Toast.LENGTH_SHORT).show();
+                });
+        });
     }
 
     private void addToItinerary(String activityName) {

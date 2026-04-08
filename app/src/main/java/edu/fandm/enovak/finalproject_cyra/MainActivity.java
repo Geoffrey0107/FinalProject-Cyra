@@ -186,12 +186,14 @@ public class MainActivity extends AppCompatActivity {
                 // ON
                 tvConnectionLabel.setText("On");
                 Toast.makeText(this, "Connection Mode ON", Toast.LENGTH_SHORT).show();
+                UserSessionManager.getInstance().setComms(isChecked); // update comms
 
                 navChat.setVisibility(View.VISIBLE);
             } else {
                 // OFF
                 tvConnectionLabel.setText("Off");
                 Toast.makeText(this, "Connection Mode OFF", Toast.LENGTH_SHORT).show();
+                UserSessionManager.getInstance().setComms(isChecked);
 
                 navChat.setVisibility(View.INVISIBLE);
             }

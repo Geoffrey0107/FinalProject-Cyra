@@ -48,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
             logOut.setVisibility(View.VISIBLE);
         }
 
+        // button to log in
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // Button to go to registration
         registerBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // button to log out clear the session
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // about cyra button. Opens up dialog that gives some information about the app
         aboutCyraBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

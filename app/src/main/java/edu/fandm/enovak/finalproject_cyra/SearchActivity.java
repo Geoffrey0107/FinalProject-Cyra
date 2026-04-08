@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,6 +52,14 @@ public class SearchActivity extends AppCompatActivity {
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+
+        ImageView ivActivityIcon = findViewById(R.id.ivSearchIcon);
+        TextView tvActivityText = findViewById(R.id.tvSearchText);
+
+        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+
+        ivActivityIcon.setColorFilter(activeColor);
+        tvActivityText.setTextColor(activeColor);
 
         navItinerary.setOnClickListener(new View.OnClickListener() {
             @Override

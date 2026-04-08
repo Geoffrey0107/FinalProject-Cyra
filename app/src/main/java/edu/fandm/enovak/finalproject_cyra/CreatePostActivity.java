@@ -10,7 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -51,6 +53,14 @@ public class CreatePostActivity extends AppCompatActivity {
         etDescription = findViewById(R.id.etDescription);
         btnSubmitPost = findViewById(R.id.btnSubmitPost);
         btnSelectImage = findViewById(R.id.btnUploadImage);
+
+        ImageView ivActivityIcon = findViewById(R.id.ivPostIcon);
+        TextView tvActivityText = findViewById(R.id.tvPostIcon);
+
+        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+
+        ivActivityIcon.setColorFilter(activeColor);
+        tvActivityText.setTextColor(activeColor);
 
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),

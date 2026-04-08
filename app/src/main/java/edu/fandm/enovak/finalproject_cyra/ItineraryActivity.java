@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +40,15 @@ public class ItineraryActivity extends AppCompatActivity {
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
+
+        ImageView ivItineraryIcon = findViewById(R.id.ivItineraryIcon);
+        TextView tvItineraryText = findViewById(R.id.tvItineraryText);
+
+        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+
+        ivItineraryIcon.setColorFilter(activeColor);
+        tvItineraryText.setTextColor(activeColor);
+
         itineraryListView = findViewById(R.id.itineraryListView);
         ImageButton btnShare = findViewById(R.id.share_button);
 

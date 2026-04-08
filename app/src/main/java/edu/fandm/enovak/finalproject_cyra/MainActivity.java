@@ -71,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
         postAdapter = new PostAdapter(this, postList);
         placesListView.setAdapter(postAdapter);
 
+        ImageView ivActivityIcon = findViewById(R.id.ivActivityIcon);
+        TextView tvActivityText = findViewById(R.id.tvActivityText);
+
+        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+
+        ivActivityIcon.setColorFilter(activeColor);
+        tvActivityText.setTextColor(activeColor);
+
         loadPosts();
 
         ImageButton btnProfile, btnMore;

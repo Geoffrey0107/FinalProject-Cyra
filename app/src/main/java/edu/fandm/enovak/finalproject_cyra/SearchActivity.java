@@ -1,16 +1,19 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SearchActivity extends AppCompatActivity {
 
     private static final String[] places = {
+            "Lancaster, PA, United States",
             "Tokyo, Japan",
             "London, United Kingdom",
             "New York City, United States",
@@ -33,28 +36,47 @@ public class SearchActivity extends AppCompatActivity {
             "Singapore, Singapore"
     };
 
-    private ImageButton btnBack;
     private TextView textSearchQuery;
+
+    LinearLayout navActivity, navItinerary, navPost,navChat,navSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        btnBack = findViewById(R.id.btnBack);
+
         textSearchQuery = findViewById(R.id.textSearchQuery);
 
+        navActivity = findViewById(R.id.navActivity);
+        navItinerary = findViewById(R.id.navItinerary);
+        navPost = findViewById(R.id.navPost);
+
+        navItinerary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SearchActivity.this, ItineraryActivity.class);
+                startActivity(intent);
+            }
+        });
+        navActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SearchActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        navPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SearchActivity.this, CreatePostActivity.class);
+                startActivity(intent);
+            }
+        });
         String query = getIntent().getStringExtra("SEARCH_QUERY");
         if (query != null && !query.isEmpty()) {
             textSearchQuery.setText("Showing results for: \"" + query + "\"");
         }
-
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getApplicationContext(),

@@ -37,6 +37,7 @@ public class LoginFragment extends Fragment {
     private EditText passwordEditText;
     private Button loginButton;
     private Button backButton;
+    private Button resetPass;
     private FirebaseAuth fba;
     private FirebaseFirestore db;
 
@@ -78,6 +79,7 @@ public class LoginFragment extends Fragment {
         passwordEditText = (EditText) view.findViewById(R.id.login_password);
         loginButton = (Button) view.findViewById(R.id.login_submit);
         backButton = (Button) view.findViewById(R.id.back_button_login);
+        resetPass = (Button) view.findViewById(R.id.reset_password);
 
         // initializes firebase auth instance and firestore database instance
         fba = FirebaseAuth.getInstance();
@@ -154,6 +156,22 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        // sends email to reset password
+        resetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = emailEditText.getText().toString();
+
+                if (email.isEmpty()) {
+                    Toast.makeText(getActivity(),
+                            "Enter your email in the field first", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                sendPasswordReset(email);
+            }
+        });
+
         return view;
     }
 
@@ -198,5 +216,18 @@ public class LoginFragment extends Fragment {
                 .set(data, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
                 .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
+    }
+
+    private void sendPasswordReset(String email) {
+        fba.sendPasswordResetEmail(email)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getActivity(),
+                            "Reset email sent!", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(),
+                            "Error: " + task.getException(), Toast.LENGTH_LONG).show();
+                }
+            });
     }
 }

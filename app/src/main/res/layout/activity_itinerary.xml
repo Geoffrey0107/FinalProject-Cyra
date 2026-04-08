@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     android:background="#F8FAFC"
     tools:context=".ItineraryActivity">
 
@@ -134,6 +135,7 @@
 
         <!-- Search -->
         <LinearLayout
+            android:id="@+id/navSearch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -141,6 +143,7 @@
             android:orientation="vertical">
 
             <ImageView
+
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/outline_search_24" />

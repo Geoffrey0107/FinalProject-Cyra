@@ -25,7 +25,7 @@ public class ReviewActivity extends AppCompatActivity {
     private Button btnSubmitReview;
     private TextView tvReviewTitle;
 
-    LinearLayout navActivity;
+    LinearLayout navActivity,navPost,navSearch,navItinerary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,11 @@ public class ReviewActivity extends AppCompatActivity {
         etReviewText = findViewById(R.id.et_review_text);
         btnSubmitReview = findViewById(R.id.btn_submit_review);
         tvReviewTitle = findViewById(R.id.tv_review_title);
+
         navActivity = findViewById(R.id.navActivity);
+        navPost = findViewById(R.id.navPost);
+        navSearch = findViewById(R.id.navSearch);
+        navItinerary = findViewById(R.id.navItinerary);
 
         String selectedPlace = getIntent().getStringExtra("place_name");
 
@@ -75,6 +79,17 @@ public class ReviewActivity extends AppCompatActivity {
             Intent intent = new Intent(ReviewActivity.this, MainActivity.class);
             startActivity(intent);
         });
+        navPost.setOnClickListener(v -> {
+            Intent intent = new Intent(ReviewActivity.this, CreatePostActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        navSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(ReviewActivity.this, SearchActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+
 
         btnSubmitReview.setOnClickListener(v -> submitReviewData());
     }

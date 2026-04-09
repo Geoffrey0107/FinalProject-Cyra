@@ -29,9 +29,14 @@ public class MainActivity extends AppCompatActivity {
     ImageButton btnAdd1, btnAdd2,btnProfile,btnMore;
     LinearLayout navActivity, navItinerary, navPost, navSearch;
 
-    String selectedCountry = "USA";
-    String selectedState = "NY";
-    String selectedCity = "New York";
+    private static final String PREFS_NAME = "cyra_prefs";
+    private static final String KEY_COUNTRY = "selected_country";
+    private static final String KEY_STATE = "selected_state";
+    private static final String KEY_CITY = "selected_city";
+
+    String selectedCountry;
+    String selectedState;
+    String selectedCity;
     TextView tvTopLocation;
 
     ArrayList<Post> postList;
@@ -52,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        loadSelectedLocation();
         tvTopLocation = findViewById(R.id.tvTopLocation);
         tvTopLocation.setText(selectedCity);
 
@@ -71,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         postAdapter = new PostAdapter(this, postList);
         placesListView.setAdapter(postAdapter);
 
+        saveSelectedLocation();
+        tvTopLocation.setText(selectedCity);
         loadPosts();
 
         ImageButton btnProfile, btnMore;
@@ -117,31 +124,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intent);
         });
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("posts")
-                .whereEqualTo("country", "USA")
-                .whereEqualTo("state", "PA")
-                .whereEqualTo("city", "Lancaster")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Log.d("FIRESTORE", "Loaded posts: " + postList.size());
-                    postList.clear();
-
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        Post post = doc.toObject(Post.class);
-                        if (post != null) {
-                            postList.add(post);
-                            Log.d("FIRESTORE", "Post title: " + post.getTitle());
-                        }
-                    }
-
-                    postAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
-                });
     }
 
     private void addToItinerary(String activityName) {
@@ -202,9 +184,27 @@ public class MainActivity extends AppCompatActivity {
                         selectedCountry = parts[2];
                     }
 
+                    saveSelectedLocation();
+
                     tvTopLocation.setText(selectedCity);
                     loadPosts();
                 })
                 .show();
+    }
+    private void loadSelectedLocation() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        selectedCountry = prefs.getString(KEY_COUNTRY, "USA");
+        selectedState = prefs.getString(KEY_STATE, "NY");
+        selectedCity = prefs.getString(KEY_CITY, "New York");
+
+    }
+    private void saveSelectedLocation() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit()
+                .putString(KEY_COUNTRY, selectedCountry)
+                .putString(KEY_STATE, selectedState)
+                .putString(KEY_CITY, selectedCity)
+                .apply();
     }
 }

@@ -154,6 +154,7 @@ public class CreatePostActivity extends AppCompatActivity {
                                                 .collection("posts")
                                                 .add(post)
                                                 .addOnSuccessListener(doc -> {
+                                                    saveLocationIfNeeded(city, state, country);
                                                     Toast.makeText(CreatePostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
                                                     finish();
                                                 })
@@ -177,5 +178,21 @@ public class CreatePostActivity extends AppCompatActivity {
                 Toast.makeText(this, "Image processing failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void saveLocationIfNeeded(String city, String state, String country) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        String locationId = city + "_" + state + "_" + country;
+        locationId = locationId.replace(" ", "_");
+
+        java.util.HashMap<String, Object> locationMap = new java.util.HashMap<>();
+        locationMap.put("city", city);
+        locationMap.put("state", state);
+        locationMap.put("country", country);
+        locationMap.put("displayName", city + ", " + state + ", " + country);
+
+        db.collection("locations")
+                .document(locationId)
+                .set(locationMap);
     }
 }

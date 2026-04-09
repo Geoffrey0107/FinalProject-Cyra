@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     String selectedState;
     String selectedCity;
     TextView tvTopLocation;
+    ArrayList<String> availableLocations = new ArrayList<>();
 
     ArrayList<Post> postList;
     PostAdapter postAdapter;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         tvTopLocation = findViewById(R.id.tvTopLocation);
         tvTopLocation.setText(selectedCity);
 
-        tvTopLocation.setOnClickListener(v -> showLocationDialog());
+        tvTopLocation.setOnClickListener(v -> loadLocationsAndShowDialog());
 
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);
@@ -165,12 +166,8 @@ public class MainActivity extends AppCompatActivity {
         loadPosts();
     }
 
-    private void showLocationDialog() {
-        String[] locations = {
-                "Lancaster, PA, USA",
-                "Philadelphia, PA, USA",
-                "New York, NY, USA",
-        };
+    private void showDynamicLocationDialog() {
+        String[] locations = availableLocations.toArray(new String[0]);
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Select Location")
@@ -185,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     saveSelectedLocation();
-
                     tvTopLocation.setText(selectedCity);
                     loadPosts();
                 })
@@ -206,5 +202,30 @@ public class MainActivity extends AppCompatActivity {
                 .putString(KEY_STATE, selectedState)
                 .putString(KEY_CITY, selectedCity)
                 .apply();
+    }
+    private void loadLocationsAndShowDialog() {
+        FirebaseFirestore.getInstance()
+                .collection("locations")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    availableLocations.clear();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String displayName = doc.getString("displayName");
+                        if (displayName != null && !displayName.isEmpty()) {
+                            availableLocations.add(displayName);
+                        }
+                    }
+
+                    if (availableLocations.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "No locations available", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    showDynamicLocationDialog();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to load locations", Toast.LENGTH_SHORT).show();
+                });
     }
 }

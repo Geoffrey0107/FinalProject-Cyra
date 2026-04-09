@@ -98,7 +98,7 @@ public class ItineraryActivity extends AppCompatActivity {
         itineraryListView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedPlace = UserSessionManager.getInstance().getItineraryList().get(position);
 
-            Intent intent = new Intent(ItineraryActivity.this, ReviewActivity.class);
+            Intent intent = new Intent(ItineraryActivity.this, PlaceDetails.class);
             intent.putExtra("place_name", selectedPlace);
             startActivity(intent);
         });

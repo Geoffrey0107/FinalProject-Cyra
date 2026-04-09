@@ -26,8 +26,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     Button testBut;
-    ImageButton btnAdd1, btnAdd2,btnProfile,btnMore;
-    LinearLayout navActivity, navItinerary, navPost, navSearch;
+    ImageButton btnAdd1, btnAdd2;
+    LinearLayout navActivity, navItinerary, navPost, navSearch, navChat;
 
     private static final String PREFS_NAME = "cyra_prefs";
     private static final String KEY_COUNTRY = "selected_country";
@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
+        navChat = findViewById(R.id.navChat);
 
         placesListView = findViewById(R.id.placesListView);
         postList = new ArrayList<>();
@@ -123,6 +124,11 @@ public class MainActivity extends AppCompatActivity {
 
         navSearch.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intent);
+        });
+
+        navChat.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, InboxActivity.class);
             startActivity(intent);
         });
     }

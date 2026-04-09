@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -96,50 +97,48 @@ public class LoginFragment extends Fragment {
                     // firebase logic to get user from
                     // tries to sign in with email and password
                     fba.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) { // if log in was successful
-                                // get the current user
-                                FirebaseUser firebaseUser = fba.getCurrentUser();
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    // get the current user
+                                    FirebaseUser firebaseUser = fba.getCurrentUser();
 
-                                if (firebaseUser != null) {
-                                    String uid = firebaseUser.getUid(); // gets user id
-                                    // Fetch user object from Firestore collection user
-                                    db.collection("users").document(uid)
-                                            .get()
-                                            .addOnSuccessListener(documentSnapshot -> { // if it succeeds, pass snapshot of current user/document
-                                                if (documentSnapshot.exists()) { // checks if user actually exists
-                                                    User user = documentSnapshot.toObject(User.class); // converts it back to user object
+                                    if (firebaseUser != null) {
+                                        String uid = firebaseUser.getUid(); // gets user id
+                                        // Fetch user object from Firestore collection user
+                                        db.collection("users").document(uid)
+                                                .get()
+                                                .addOnSuccessListener(documentSnapshot -> { // if it succeeds, pass snapshot of current user/document
+                                                    if (documentSnapshot.exists()) { // checks if user actually exists
+                                                        User user = documentSnapshot.toObject(User.class); // converts it back to user object
 
-                                                    // login successful
-                                                    Toast.makeText(getActivity(), "Logging in with: " + email,
-                                                            Toast.LENGTH_SHORT).show();
+                                                        // login successful
+                                                        Toast.makeText(getActivity(), "Logging in with: " + email,
+                                                                Toast.LENGTH_SHORT).show();
 
-                                                    // this is where we would navigate to the main feed
-                                                    Intent i = new Intent(getActivity(), MainActivity.class);
-                                                    
-                                                    // sets the userId and username
-                                                    UserSessionManager.getInstance().setUserId(user.getUserId());
-                                                    UserSessionManager.getInstance().setUsername(user.getUsername());
-                                
-                                                    // loads itinerary from firebase
-                                                    loadUserItinerary(user.getUserId());
+                                                        // this is where we would navigate to the main feed
+                                                        Intent i = new Intent(getActivity(), MainActivity.class);
+                                                        UserSessionManager.getInstance().setUserId(user.getUserId());
+                                                        UserSessionManager.getInstance().setUsername(user.getUsername());
+                                                        UserSessionManager.getInstance().setComms(user.isShowLocation());
 
-                                                    startActivity(i);
-                                                } else {
-                                                    Toast.makeText(getActivity(), "Logging in with: " + email,
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                Toast.makeText(getActivity(), "Error fetching user info: database error", Toast.LENGTH_SHORT).show();
-                                            });
+                                                        loadUserItinerary(user.getUserId());
+
+                                                        startActivity(i);
+                                                    } else {
+                                                        Toast.makeText(getActivity(), "Logging in with: " + email,
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(getActivity(), "Error fetching user info: database error", Toast.LENGTH_SHORT).show();
+                                                });
+                                    } else {
+                                        Toast.makeText(getActivity(), "Login Failed: User not found", Toast.LENGTH_SHORT).show();
+                                    }
                                 } else {
-                                    Toast.makeText(getActivity(), "Login Failed: User not found", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Login failed: email or password was wrong.", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                Toast.makeText(getActivity(), "Login failed: email or password was wrong.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                            });
                 } else {
                     Toast.makeText(getActivity(), "Please enter email and password",
                             Toast.LENGTH_SHORT).show();

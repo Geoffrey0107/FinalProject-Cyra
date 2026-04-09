@@ -81,10 +81,11 @@ public class PendingVerificationActivity extends AppCompatActivity {
                                     User newUser = new User(user.getUid(), username, System.currentTimeMillis(), false, null, null);
                                     db.collection("users").document(user.getUid()).set(newUser);
 
-                                    // routes to main and sends user information over for profile creation
-                                    Intent i = new Intent(PendingVerificationActivity.this, MainActivity.class);
-                                    UserSessionManager.getInstance().setUserId(newUser.getUserId());
-                                    UserSessionManager.getInstance().setUsername(newUser.getUsername());
+                                        // routes to main and sends user information over for profile creation
+                                        Intent i = new Intent(PendingVerificationActivity.this, MainActivity.class);
+                                        UserSessionManager.getInstance().setUserId(newUser.getUserId());
+                                        UserSessionManager.getInstance().setUsername(newUser.getUsername());
+                                        UserSessionManager.getInstance().setComms(newUser.isShowLocation());
 
                                     loadUserItinerary(newUser.getUserId());
 

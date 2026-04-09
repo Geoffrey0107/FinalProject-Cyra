@@ -41,10 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_STATE = "selected_state";
     private static final String KEY_CITY = "selected_city";
 
-    String selectedCountry;
-    String selectedState;
-    String selectedCity;
-    TextView tvTopLocation;
     ArrayList<String> availableLocations = new ArrayList<>();
 
     ArrayList<Post> postList;
@@ -70,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         tvTopLocation = findViewById(R.id.tvTopLocation);
         tvTopLocation.setText(selectedCity);
 
-        tvTopLocation.setOnClickListener(v -> showLocationDialog());
+//        tvTopLocation.setOnClickListener(v -> showLocationDialog());
         tvConnectionLabel = findViewById(R.id.tvConnectionLabel);
         tvTopLocation.setOnClickListener(v -> loadLocationsAndShowDialog());
 

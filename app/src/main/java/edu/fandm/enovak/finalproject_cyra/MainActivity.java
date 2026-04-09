@@ -36,6 +36,16 @@ public class MainActivity extends AppCompatActivity {
     String selectedState = "NY";
     String selectedCity = "New York";
     TextView tvTopLocation, tvConnectionLabel;
+    private static final String PREFS_NAME = "cyra_prefs";
+    private static final String KEY_COUNTRY = "selected_country";
+    private static final String KEY_STATE = "selected_state";
+    private static final String KEY_CITY = "selected_city";
+
+    String selectedCountry;
+    String selectedState;
+    String selectedCity;
+    TextView tvTopLocation;
+    ArrayList<String> availableLocations = new ArrayList<>();
 
     ArrayList<Post> postList;
     PostAdapter postAdapter;
@@ -56,12 +66,13 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        loadSelectedLocation();
         tvTopLocation = findViewById(R.id.tvTopLocation);
         tvTopLocation.setText(selectedCity);
 
         tvTopLocation.setOnClickListener(v -> showLocationDialog());
         tvConnectionLabel = findViewById(R.id.tvConnectionLabel);
+        tvTopLocation.setOnClickListener(v -> loadLocationsAndShowDialog());
 
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);
@@ -78,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         postAdapter = new PostAdapter(this, postList);
         placesListView.setAdapter(postAdapter);
 
+        saveSelectedLocation();
+        tvTopLocation.setText(selectedCity);
         loadPosts();
 
         ImageButton btnProfile, btnMore;
@@ -249,12 +262,8 @@ public class MainActivity extends AppCompatActivity {
         loadPosts();
     }
 
-    private void showLocationDialog() {
-        String[] locations = {
-                "Lancaster, PA, USA",
-                "Philadelphia, PA, USA",
-                "New York, NY, USA",
-        };
+    private void showDynamicLocationDialog() {
+        String[] locations = availableLocations.toArray(new String[0]);
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Select Location")
@@ -268,9 +277,51 @@ public class MainActivity extends AppCompatActivity {
                         selectedCountry = parts[2];
                     }
 
+                    saveSelectedLocation();
                     tvTopLocation.setText(selectedCity);
                     loadPosts();
                 })
                 .show();
+    }
+    private void loadSelectedLocation() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        selectedCountry = prefs.getString(KEY_COUNTRY, "USA");
+        selectedState = prefs.getString(KEY_STATE, "NY");
+        selectedCity = prefs.getString(KEY_CITY, "New York");
+
+    }
+    private void saveSelectedLocation() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit()
+                .putString(KEY_COUNTRY, selectedCountry)
+                .putString(KEY_STATE, selectedState)
+                .putString(KEY_CITY, selectedCity)
+                .apply();
+    }
+    private void loadLocationsAndShowDialog() {
+        FirebaseFirestore.getInstance()
+                .collection("locations")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    availableLocations.clear();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String displayName = doc.getString("displayName");
+                        if (displayName != null && !displayName.isEmpty()) {
+                            availableLocations.add(displayName);
+                        }
+                    }
+
+                    if (availableLocations.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "No locations available", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    showDynamicLocationDialog();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to load locations", Toast.LENGTH_SHORT).show();
+                });
     }
 }

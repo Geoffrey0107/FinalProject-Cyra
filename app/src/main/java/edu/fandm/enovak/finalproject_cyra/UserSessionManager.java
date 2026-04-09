@@ -47,9 +47,11 @@ public class UserSessionManager {
 
     // add to the itinerary
     public boolean getCommsStatus() {
-        return this.openToComms;
+        if (this.openToComms == null) {
+            return false; // default value if not yet set
+        }
+        return this.openToComms; // auto-unboxes Boolean to boolean safely
     }
-
     public void setComms(Boolean status) {
         this.openToComms = status;
     }

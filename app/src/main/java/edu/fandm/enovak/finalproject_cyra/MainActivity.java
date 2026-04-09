@@ -34,18 +34,19 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_COUNTRY = "selected_country";
     private static final String KEY_STATE = "selected_state";
     private static final String KEY_CITY = "selected_city";
+    SwitchCompat connectionToggle;
+    private String userId;
+    private boolean isConnectionMode;
+    TextView tvTopLocation, tvConnectionLabel;
+    FirebaseFirestore db;
 
     String selectedCountry;
     String selectedState;
     String selectedCity;
-    TextView tvTopLocation;
     ArrayList<String> availableLocations = new ArrayList<>();
     ArrayList<Post> postList;
     PostAdapter postAdapter;
     ListView placesListView;
-    public static final String EXTRA_USER_ID = "extra_user_id";
-    public static final String EXTRA_USERNAME = "extra_username";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +59,19 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        db = FirebaseFirestore.getInstance();
+
         loadSelectedLocation();
         tvTopLocation = findViewById(R.id.tvTopLocation);
         tvTopLocation.setText(selectedCity);
 
         tvTopLocation.setOnClickListener(v -> loadLocationsAndShowDialog());
+
+        tvConnectionLabel = findViewById(R.id.tvConnectionLabel);
+        connectionToggle = findViewById(R.id.switchConnectionMode);
+
+        userId = UserSessionManager.getInstance().getUserId();
 
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);
@@ -130,6 +139,58 @@ public class MainActivity extends AppCompatActivity {
         navChat.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, InboxActivity.class);
             startActivity(intent);
+        });
+
+        // initial state setup
+        isConnectionMode = UserSessionManager.getInstance().getCommsStatus();
+
+        if (!isConnectionMode) {
+            navChat.setVisibility(View.INVISIBLE);
+        } else {
+            navChat.setVisibility(View.VISIBLE);
+        }
+
+        connectionToggle.setChecked(isConnectionMode);
+        tvConnectionLabel.setText(isConnectionMode ? "On" : "Off");
+
+        connectionToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            // checks if user is logged in.
+            // will not allow user to use connection mode if not logged in
+            if (!UserSessionManager.getInstance().isLoggedIn()) {
+                connectionToggle.setEnabled(false); // disables toggle
+                Toast.makeText(MainActivity.this, "Must be logged in to use connection mode",
+                        Toast.LENGTH_LONG).show();
+                return;
+            } else {
+                connectionToggle.setEnabled(true);
+            }
+
+            if (isChecked) {
+                // ON
+                tvConnectionLabel.setText("On");
+                Toast.makeText(this, "Connection Mode ON", Toast.LENGTH_SHORT).show();
+                UserSessionManager.getInstance().setComms(isChecked); // update comms
+
+                navChat.setVisibility(View.VISIBLE);
+            } else {
+                // OFF
+                tvConnectionLabel.setText("Off");
+                Toast.makeText(this, "Connection Mode OFF", Toast.LENGTH_SHORT).show();
+                UserSessionManager.getInstance().setComms(isChecked);
+
+                navChat.setVisibility(View.INVISIBLE);
+            }
+
+            db.collection("users")
+                    .document(userId)
+                    .update("showLocation", isChecked)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to update", Toast.LENGTH_SHORT).show();
+                    });
         });
     }
 

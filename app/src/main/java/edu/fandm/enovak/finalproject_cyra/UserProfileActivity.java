@@ -1,5 +1,6 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -160,7 +162,7 @@ public class UserProfileActivity extends AppCompatActivity {
         if (imageUrl != null) {
             user.put("profileImageUrl", imageUrl);
         }
-        if(UserSessionManager.getInstance().isLoggedIn()){
+        if (UserSessionManager.getInstance().isLoggedIn()) {
             db.collection("users").document(currentUser.getUid())
                     .update(user)
                     .addOnSuccessListener(aVoid -> {
@@ -168,6 +170,16 @@ public class UserProfileActivity extends AppCompatActivity {
                         finish();
                     })
                     .addOnFailureListener(e -> Log.e(TAG, "Firestore update failed", e));
-            }
+        } else {
+            new AlertDialog.Builder(UserProfileActivity.this)
+                    .setTitle("Go to Login?")
+                    .setMessage("You must be logged in to save your profile!")
+                    .setPositiveButton("Login", (dialog, which) -> {
+                        Intent intent = new Intent(UserProfileActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         }
+    }
 }

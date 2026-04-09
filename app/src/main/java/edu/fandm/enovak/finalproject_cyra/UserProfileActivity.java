@@ -66,7 +66,10 @@ public class UserProfileActivity extends AppCompatActivity {
         Button btnSaveProfile = findViewById(R.id.btn_save_profile);
 
         // Fetch data from Firestore so it loads when you open the activity
-        loadUserData();
+        if(UserSessionManager.getInstance().isLoggedIn()){
+            loadUserData();
+        }
+
 
         btnSelectImage.setOnClickListener(v -> getContentLauncher.launch("image/*"));
         btnSaveProfile.setOnClickListener(v -> saveProfile());
@@ -94,7 +97,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private void saveProfile() {
         String name = etName.getText().toString().trim();
 
-        if (currentUser == null) {
+        if (UserSessionManager.getInstance().isLoggedIn()) {
             Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -157,13 +160,14 @@ public class UserProfileActivity extends AppCompatActivity {
         if (imageUrl != null) {
             user.put("profileImageUrl", imageUrl);
         }
-
-        db.collection("users").document(currentUser.getUid())
-                .update(user)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Profile Saved to Cloud!", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
-                .addOnFailureListener(e -> Log.e(TAG, "Firestore update failed", e));
-    }
+        if(UserSessionManager.getInstance().isLoggedIn()){
+            db.collection("users").document(currentUser.getUid())
+                    .update(user)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Profile Saved to Cloud!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    })
+                    .addOnFailureListener(e -> Log.e(TAG, "Firestore update failed", e));
+            }
+        }
 }

@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     Button testBut;
-    ImageButton btnAdd1, btnAdd2;
+    ImageButton btnAdd1, btnAdd2,btnProfile,btnMore;
     LinearLayout navActivity, navItinerary, navPost, navSearch, navChat;
 
     private static final String PREFS_NAME = "cyra_prefs";
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     String selectedCity;
     TextView tvTopLocation;
     ArrayList<String> availableLocations = new ArrayList<>();
-
     ArrayList<Post> postList;
     PostAdapter postAdapter;
     ListView placesListView;

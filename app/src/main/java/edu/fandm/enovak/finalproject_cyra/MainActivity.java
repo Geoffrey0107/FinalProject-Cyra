@@ -145,9 +145,9 @@ public class MainActivity extends AppCompatActivity {
         isConnectionMode = UserSessionManager.getInstance().getCommsStatus();
 
         if (!isConnectionMode) {
-            navChat.setVisibility(View.INVISIBLE);
+            navChat.setEnabled(false);
         } else {
-            navChat.setVisibility(View.VISIBLE);
+            navChat.setEnabled(true);
         }
 
         connectionToggle.setChecked(isConnectionMode);

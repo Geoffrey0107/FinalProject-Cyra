@@ -1,8 +1,11 @@
 package edu.fandm.enovak.finalproject_cyra;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +20,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBut;
     private Button registerBut;
     private Button aboutCyraBut;
+    private Button logOut;
 
 
     @Override
@@ -33,7 +37,20 @@ public class LoginActivity extends AppCompatActivity {
         loginBut = (Button) findViewById(R.id.loginBut);
         registerBut = (Button) findViewById(R.id.registerBut);
         aboutCyraBut = (Button) findViewById(R.id.about_cyra_but);
+        logOut = (Button) findViewById(R.id.logOutBut);
 
+        // if not logged in, hide log out button
+        if (!UserSessionManager.getInstance().isLoggedIn()) {
+            logOut.setVisibility(View.GONE);
+            registerBut.setVisibility(View.VISIBLE);
+            loginBut.setVisibility(View.VISIBLE);
+        } else { // hide other buttons otherwise
+            registerBut.setVisibility(View.GONE);
+            loginBut.setVisibility(View.GONE);
+            logOut.setVisibility(View.VISIBLE);
+        }
+
+        // button to log in
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -41,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // Button to go to registration
         registerBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,6 +66,20 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // button to log out clear the session
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // clears user session then goes back to main
+                UserSessionManager.getInstance().clear();
+                Toast.makeText(LoginActivity.this, "Successfully Logged out.",
+                        Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+
+        // about cyra button. Opens up dialog that gives some information about the app
         aboutCyraBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

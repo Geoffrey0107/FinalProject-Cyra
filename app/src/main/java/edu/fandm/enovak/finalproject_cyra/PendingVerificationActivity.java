@@ -53,7 +53,7 @@ public class PendingVerificationActivity extends AppCompatActivity {
         // enables reset button after a minute
         enableResendAfterDelay();
 
-        // allows user to resend verification email
+        // allows user to resend verification email after a delay
         resendButton.setOnClickListener(v -> {
             if (user != null && !user.isEmailVerified()) {
                 user.sendEmailVerification().addOnCompleteListener(task -> { // sends verification again
@@ -75,25 +75,26 @@ public class PendingVerificationActivity extends AppCompatActivity {
                     if (user.isEmailVerified()) { // only if the email is verified
                         // Save user in Firestore
                         db.collection("users").document(user.getUid())
-                                .get()
-                                .addOnSuccessListener(doc -> {
-                                    if (!doc.exists()) { // if the user does not exist then create it
-                                        User newUser = new User(user.getUid(), username, System.currentTimeMillis(), false, null, null);
-                                        db.collection("users").document(user.getUid()).set(newUser);
+                            .get()
+                            .addOnSuccessListener(doc -> {
+                                if (!doc.exists()) { // if the user does not exist then create it
+                                    User newUser = new User(user.getUid(), username, System.currentTimeMillis(), false, null, null);
+                                    db.collection("users").document(user.getUid()).set(newUser);
 
                                         // routes to main and sends user information over for profile creation
                                         Intent i = new Intent(PendingVerificationActivity.this, MainActivity.class);
                                         UserSessionManager.getInstance().setUserId(newUser.getUserId());
                                         UserSessionManager.getInstance().setUsername(newUser.getUsername());
+                                        UserSessionManager.getInstance().setComms(newUser.isShowLocation());
 
-                                        loadUserItinerary(newUser.getUserId());
+                                    loadUserItinerary(newUser.getUserId());
 
-                                        // Go to MainActivity after verification
+                                    // Go to MainActivity after verification
 
-                                        startActivity(i);
-                                    }
-                                    finish();
-                                });
+                                    startActivity(i);
+                                }
+                                finish();
+                            });
                     } else {
                         // delete email off of auth so it does not take up extra space
                         user.delete().addOnCompleteListener(delTask -> {
@@ -119,6 +120,7 @@ public class PendingVerificationActivity extends AppCompatActivity {
         handler.postDelayed(() -> resendButton.setEnabled(true), 60000); // 1 min
     }
 
+    // loads the user Itinerary
     private void loadUserItinerary(String userId) {
         UserSessionManager.getInstance().setUserId(userId);
         UserSessionManager.getInstance().setUsername(FirebaseAuth.getInstance().getCurrentUser().getEmail());
@@ -130,12 +132,11 @@ public class PendingVerificationActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         ArrayList<String> savedItinerary = (ArrayList<String>) documentSnapshot.get("items");
-                        if (savedItinerary != null) {
+                        if (savedItinerary != null) { // this probably will not execute at all since this is under registration
                             // Merge Firebase itinerary with local (anonymous) itinerary
                             for (String place : savedItinerary) {
-                                if (!UserSessionManager.getInstance().getItineraryList().contains(place)) {
-                                    UserSessionManager.getInstance().addToItinerary(place);
-                                }
+                                // Merge Firebase itinerary with local (anonymous) itinerary
+                                UserSessionManager.getInstance().setItineraryList(savedItinerary);
                             }
                         }
                     } else {
@@ -145,6 +146,7 @@ public class PendingVerificationActivity extends AppCompatActivity {
                 });
     }
 
+    // save the itinerary to firebase.
     private void saveItineraryToFirestore() {
         if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
 

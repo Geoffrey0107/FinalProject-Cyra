@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/white"
     android:gravity="center"
     android:padding="32dp"
     android:clickable="true"
-    android:focusable="true"
-    android:background="@color/forest_green">
+    android:focusable="true">
 
     <!-- Title / Instruction -->
     <TextView
@@ -18,7 +18,7 @@
         android:text="Pending Email Verification"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         android:layout_marginBottom="16dp"/>
 
     <TextView
@@ -28,7 +28,7 @@
         android:text="A verification email has been sent to your address. Please check your inbox and verify your email to continue. It may have appeared in spam.
         \n\nIf the email failed to send, you may retry in 1 minute."
         android:textSize="16sp"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         android:gravity="center"
         android:layout_marginBottom="32dp"/>
 

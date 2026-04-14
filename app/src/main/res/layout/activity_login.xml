@@ -10,7 +10,7 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/forest_green"
+        android:background="@color/white"
         android:padding="24dp">
 
         <!-- App Title -->
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:text="Welcome to Cyra"
             android:textSize="32sp"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="60dp"/>
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="Solo Travelling"
             android:textSize="16sp"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:layout_below="@id/welcome_title"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"/>
@@ -72,6 +72,19 @@
                 android:padding="12dp"/>
 
             <Button
+                android:id="@+id/logOutBut"
+                android:layout_width="250dp"
+                android:layout_height="60dp"
+                android:text="Logout"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/forest_green_dark"
+                android:elevation="6dp"
+                android:layout_marginBottom="20dp"
+                android:textAllCaps="false"
+                android:padding="12dp"/>
+
+
+            <Button
                 android:id="@+id/about_cyra_but"
                 android:layout_width="250dp"
                 android:layout_height="60dp"
@@ -90,7 +103,7 @@
             android:layout_height="wrap_content"
             android:text="© 2026 Cyra"
             android:textSize="12sp"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp"/>

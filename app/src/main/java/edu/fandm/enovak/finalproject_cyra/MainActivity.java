@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,18 +28,25 @@ public class MainActivity extends AppCompatActivity {
 
     Button testBut;
     ImageButton btnAdd1, btnAdd2,btnProfile,btnMore;
-    LinearLayout navActivity, navItinerary, navPost, navSearch;
+    LinearLayout navActivity, navItinerary, navPost, navSearch, navChat;
 
-    String selectedCountry = "USA";
-    String selectedState = "NY";
-    String selectedCity = "New York";
-    TextView tvTopLocation;
+    private static final String PREFS_NAME = "cyra_prefs";
+    private static final String KEY_COUNTRY = "selected_country";
+    private static final String KEY_STATE = "selected_state";
+    private static final String KEY_CITY = "selected_city";
+    SwitchCompat connectionToggle;
+    private String userId;
+    private boolean isConnectionMode;
+    TextView tvTopLocation, tvConnectionLabel;
+    FirebaseFirestore db;
 
+    String selectedCountry;
+    String selectedState;
+    String selectedCity;
+    ArrayList<String> availableLocations = new ArrayList<>();
     ArrayList<Post> postList;
     PostAdapter postAdapter;
     ListView placesListView;
-    public static final String EXTRA_USER_ID = "extra_user_id";
-    public static final String EXTRA_USERNAME = "extra_username";
 
 
     @Override
@@ -53,10 +61,18 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        db = FirebaseFirestore.getInstance();
+
+        loadSelectedLocation();
         tvTopLocation = findViewById(R.id.tvTopLocation);
         tvTopLocation.setText(selectedCity);
 
-        tvTopLocation.setOnClickListener(v -> showLocationDialog());
+        tvTopLocation.setOnClickListener(v -> loadLocationsAndShowDialog());
+
+        tvConnectionLabel = findViewById(R.id.tvConnectionLabel);
+        connectionToggle = findViewById(R.id.switchConnectionMode);
+
+        userId = UserSessionManager.getInstance().getUserId();
 
         btnProfile = findViewById(R.id.btnProfile);
         btnMore = findViewById(R.id.btnMore);
@@ -65,12 +81,15 @@ public class MainActivity extends AppCompatActivity {
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
+        navChat = findViewById(R.id.navChat);
 
         placesListView = findViewById(R.id.placesListView);
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(this, postList);
         placesListView.setAdapter(postAdapter);
 
+        saveSelectedLocation();
+        tvTopLocation.setText(selectedCity);
         ImageView ivActivityIcon = findViewById(R.id.ivActivityIcon);
         TextView tvActivityText = findViewById(R.id.tvActivityText);
 
@@ -126,30 +145,62 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        navChat.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, InboxActivity.class);
+            startActivity(intent);
+        });
 
-        db.collection("posts")
-                .whereEqualTo("country", "USA")
-                .whereEqualTo("state", "PA")
-                .whereEqualTo("city", "Lancaster")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Log.d("FIRESTORE", "Loaded posts: " + postList.size());
-                    postList.clear();
+        // initial state setup
+        isConnectionMode = UserSessionManager.getInstance().getCommsStatus();
 
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        Post post = doc.toObject(Post.class);
-                        if (post != null) {
-                            postList.add(post);
-                            Log.d("FIRESTORE", "Post title: " + post.getTitle());
-                        }
-                    }
+        if (!isConnectionMode) {
+            navChat.setEnabled(false);
+        } else {
+            navChat.setEnabled(true);
+        }
 
-                    postAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(MainActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show();
-                });
+        connectionToggle.setChecked(isConnectionMode);
+        tvConnectionLabel.setText(isConnectionMode ? "On" : "Off");
+
+        connectionToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            // checks if user is logged in.
+            // will not allow user to use connection mode if not logged in
+            if (!UserSessionManager.getInstance().isLoggedIn()) {
+                connectionToggle.setEnabled(false); // disables toggle
+                Toast.makeText(MainActivity.this, "Must be logged in to use connection mode",
+                        Toast.LENGTH_LONG).show();
+                return;
+            } else {
+                connectionToggle.setEnabled(true);
+            }
+
+            if (isChecked) {
+                // ON
+                tvConnectionLabel.setText("On");
+                Toast.makeText(this, "Connection Mode ON", Toast.LENGTH_SHORT).show();
+                UserSessionManager.getInstance().setComms(isChecked); // update comms
+
+                navChat.setVisibility(View.VISIBLE);
+            } else {
+                // OFF
+                tvConnectionLabel.setText("Off");
+                Toast.makeText(this, "Connection Mode OFF", Toast.LENGTH_SHORT).show();
+                UserSessionManager.getInstance().setComms(isChecked);
+
+                navChat.setVisibility(View.INVISIBLE);
+            }
+
+            db.collection("users")
+                    .document(userId)
+                    .update("showLocation", isChecked)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to update", Toast.LENGTH_SHORT).show();
+                    });
+        });
     }
 
     private void addToItinerary(String activityName) {
@@ -191,12 +242,8 @@ public class MainActivity extends AppCompatActivity {
         loadPosts();
     }
 
-    private void showLocationDialog() {
-        String[] locations = {
-                "Lancaster, PA, USA",
-                "Philadelphia, PA, USA",
-                "New York, NY, USA",
-        };
+    private void showDynamicLocationDialog() {
+        String[] locations = availableLocations.toArray(new String[0]);
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Select Location")
@@ -210,9 +257,51 @@ public class MainActivity extends AppCompatActivity {
                         selectedCountry = parts[2];
                     }
 
+                    saveSelectedLocation();
                     tvTopLocation.setText(selectedCity);
                     loadPosts();
                 })
                 .show();
+    }
+    private void loadSelectedLocation() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        selectedCountry = prefs.getString(KEY_COUNTRY, "USA");
+        selectedState = prefs.getString(KEY_STATE, "NY");
+        selectedCity = prefs.getString(KEY_CITY, "New York");
+
+    }
+    private void saveSelectedLocation() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit()
+                .putString(KEY_COUNTRY, selectedCountry)
+                .putString(KEY_STATE, selectedState)
+                .putString(KEY_CITY, selectedCity)
+                .apply();
+    }
+    private void loadLocationsAndShowDialog() {
+        FirebaseFirestore.getInstance()
+                .collection("locations")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    availableLocations.clear();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String displayName = doc.getString("displayName");
+                        if (displayName != null && !displayName.isEmpty()) {
+                            availableLocations.add(displayName);
+                        }
+                    }
+
+                    if (availableLocations.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "No locations available", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    showDynamicLocationDialog();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to load locations", Toast.LENGTH_SHORT).show();
+                });
     }
 }

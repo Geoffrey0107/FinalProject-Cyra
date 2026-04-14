@@ -34,10 +34,6 @@
             android:exported="false" />
 
         <activity
-            android:name=".TestLoginActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".LoginActivity"
             android:exported="false" />
 
@@ -45,6 +41,9 @@
             android:name=".ItineraryActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".InboxActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

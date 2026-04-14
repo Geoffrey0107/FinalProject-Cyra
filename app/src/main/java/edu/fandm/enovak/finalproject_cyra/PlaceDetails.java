@@ -32,6 +32,9 @@ public class PlaceDetails extends AppCompatActivity {
     private LinearLayout reviewsContainer;
     private TextView textNoReviews;
 
+    private ImageView posterProfileImage;
+    private TextView posterName;
+
     LinearLayout navActivity, navItinerary, navPost;
 
     @Override
@@ -44,6 +47,10 @@ public class PlaceDetails extends AppCompatActivity {
         placeName = findViewById(R.id.text_place_name);
         placeDescription = findViewById(R.id.text_place_description);
         btnReview = findViewById(R.id.btn_review);
+        posterProfileImage = findViewById(R.id.image_poster_profile);
+        posterName = findViewById(R.id.text_poster_name);
+        String postUserId = getIntent().getStringExtra("post_user_id");
+        String postUsername = getIntent().getStringExtra("post_username");
 
         placeLocation = findViewById(R.id.text_place_location);
         String country = getIntent().getStringExtra("place_country");
@@ -54,6 +61,12 @@ public class PlaceDetails extends AppCompatActivity {
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         reviewsContainer = findViewById(R.id.reviewsContainer);
+        if (postUsername != null && !postUsername.isEmpty()) {
+            posterName.setText("Posted by " + postUsername);
+        }
+        if (postUserId != null && !postUserId.isEmpty()) {
+            loadPosterProfile(postUserId);
+        }
 
 
         textNoReviews = findViewById(R.id.text_no_reviews);
@@ -150,6 +163,29 @@ public class PlaceDetails extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     textNoReviews.setVisibility(View.VISIBLE);
                     textNoReviews.setText("Failed to load reviews.");
+                });
+    }
+    private void loadPosterProfile(String userId) {
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String profileImageUrl = doc.getString("profileImageUrl");
+                        String username = doc.getString("username");
+
+                        if (username != null && !username.isEmpty()) {
+                            posterName.setText("Posted by " + username);
+                        }
+
+                        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                            Glide.with(this)
+                                    .load(profileImageUrl)
+                                    .circleCrop()
+                                    .into(posterProfileImage);
+                        }
+                    }
                 });
     }
 

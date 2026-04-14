@@ -35,6 +35,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private Uri imageUri;
     private ActivityResultLauncher<String> imagePickerLauncher;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,13 +105,24 @@ public class CreatePostActivity extends AppCompatActivity {
             String state = etState.getText().toString().trim();
             String city = etCity.getText().toString().trim();
 
-            if (title.isEmpty() || description.isEmpty()) {
+            if (title.isEmpty() || description.isEmpty() || country.isEmpty() || state.isEmpty() || city.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (imageUri == null) {
                 Toast.makeText(this, "Please upload an image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String userId = UserSessionManager.getInstance().getUserId();
+            String username = UserSessionManager.getInstance().getUsername();
+
+            Log.d("CREATE_POST", "Session userId = " + userId);
+            Log.d("CREATE_POST", "Session username = " + username);
+
+            if (userId == null || username == null) {
+                Toast.makeText(this, "User session missing. Please log in again.", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -143,7 +155,8 @@ public class CreatePostActivity extends AppCompatActivity {
                                                 state,
                                                 city,
                                                 imageUrl,
-                                                "test_user",
+                                                userId,
+                                                username,
                                                 timestamp
                                         );
 
@@ -151,6 +164,7 @@ public class CreatePostActivity extends AppCompatActivity {
                                                 .collection("posts")
                                                 .add(post)
                                                 .addOnSuccessListener(doc -> {
+                                                    saveLocationIfNeeded(city, state, country);
                                                     Toast.makeText(CreatePostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
                                                     finish();
                                                 })
@@ -174,5 +188,21 @@ public class CreatePostActivity extends AppCompatActivity {
                 Toast.makeText(this, "Image processing failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void saveLocationIfNeeded(String city, String state, String country) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        String locationId = city + "_" + state + "_" + country;
+        locationId = locationId.replace(" ", "_");
+
+        java.util.HashMap<String, Object> locationMap = new java.util.HashMap<>();
+        locationMap.put("city", city);
+        locationMap.put("state", state);
+        locationMap.put("country", country);
+        locationMap.put("displayName", city + ", " + state + ", " + country);
+
+        db.collection("locations")
+                .document(locationId)
+                .set(locationMap);
     }
 }

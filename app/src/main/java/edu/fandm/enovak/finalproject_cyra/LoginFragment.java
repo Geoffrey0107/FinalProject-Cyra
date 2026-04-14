@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -96,47 +97,48 @@ public class LoginFragment extends Fragment {
                     // firebase logic to get user from
                     // tries to sign in with email and password
                     fba.signInWithEmailAndPassword(email, password)
-                                    .addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            // get the current user
-                                            FirebaseUser firebaseUser = fba.getCurrentUser();
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    // get the current user
+                                    FirebaseUser firebaseUser = fba.getCurrentUser();
 
-                                            if (firebaseUser != null) {
-                                                String uid = firebaseUser.getUid(); // gets user id
-                                                // Fetch user object from Firestore collection user
-                                                db.collection("users").document(uid)
-                                                        .get()
-                                                        .addOnSuccessListener(documentSnapshot -> { // if it succeeds, pass snapshot of current user/document
-                                                            if (documentSnapshot.exists()) { // checks if user actually exists
-                                                                User user = documentSnapshot.toObject(User.class); // converts it back to user object
+                                    if (firebaseUser != null) {
+                                        String uid = firebaseUser.getUid(); // gets user id
+                                        // Fetch user object from Firestore collection user
+                                        db.collection("users").document(uid)
+                                                .get()
+                                                .addOnSuccessListener(documentSnapshot -> { // if it succeeds, pass snapshot of current user/document
+                                                    if (documentSnapshot.exists()) { // checks if user actually exists
+                                                        User user = documentSnapshot.toObject(User.class); // converts it back to user object
 
-                                                                // login successful
-                                                                Toast.makeText(getActivity(), "Logging in with: " + email,
-                                                                        Toast.LENGTH_SHORT).show();
+                                                        // login successful
+                                                        Toast.makeText(getActivity(), "Logging in with: " + email,
+                                                                Toast.LENGTH_SHORT).show();
 
-                                                                // this is where we would navigate to the main feed
-                                                                Intent i = new Intent(getActivity(), MainActivity.class);
-                                                                UserSessionManager.getInstance().setUserId(user.getUserId());
-                                                                UserSessionManager.getInstance().setUsername(user.getUsername());
+                                                        // this is where we would navigate to the main feed
+                                                        Intent i = new Intent(getActivity(), MainActivity.class);
+                                                        UserSessionManager.getInstance().setUserId(user.getUserId());
+                                                        UserSessionManager.getInstance().setUsername(user.getUsername());
+                                                        UserSessionManager.getInstance().setComms(user.isShowLocation());
 
-                                                                loadUserItinerary(user.getUserId());
+                                                        loadUserItinerary(user.getUserId());
 
-                                                                startActivity(i);
-                                                            } else {
-                                                                Toast.makeText(getActivity(), "Logging in with: " + email,
-                                                                        Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(e -> {
-                                                            Toast.makeText(getActivity(), "Error fetching user info: database error", Toast.LENGTH_SHORT).show();
-                                                        });
-                                            } else {
-                                                Toast.makeText(getActivity(), "Login Failed: User not found", Toast.LENGTH_SHORT).show();
-                                            }
-                                        } else {
-                                            Toast.makeText(getActivity(), "Login failed: email or password was wrong.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                                        startActivity(i);
+                                                    } else {
+                                                        Toast.makeText(getActivity(), "Logging in with: " + email,
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(getActivity(), "Error fetching user info: database error", Toast.LENGTH_SHORT).show();
+                                                });
+                                    } else {
+                                        Toast.makeText(getActivity(), "Login Failed: User not found", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getActivity(), "Login failed: email or password was wrong.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 } else {
                     Toast.makeText(getActivity(), "Please enter email and password",
                             Toast.LENGTH_SHORT).show();
@@ -173,24 +175,22 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
+    // loads itinerary from the firebase
     private void loadUserItinerary(String userId) {
-        UserSessionManager.getInstance().setUserId(userId);
+        UserSessionManager.getInstance().setUserId(userId); // sets the userId
+        // gets username and sets it
         UserSessionManager.getInstance().setUsername(FirebaseAuth.getInstance().getCurrentUser().getEmail());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("itineraries")
-                .document(userId)
-                .get()
+        db.collection("itineraries") // gets itinerary collection
+                .document(userId)// gets the itinerary by the userId
+                .get() // call to get
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
+                    if (documentSnapshot.exists()) { // if it exists
                         ArrayList<String> savedItinerary = (ArrayList<String>) documentSnapshot.get("items");
                         if (savedItinerary != null) {
                             // Merge Firebase itinerary with local (anonymous) itinerary
-                            for (String place : savedItinerary) {
-                                if (!UserSessionManager.getInstance().getItineraryList().contains(place)) {
-                                    UserSessionManager.getInstance().addToItinerary(place);
-                                }
-                            }
+                            UserSessionManager.getInstance().setItineraryList(savedItinerary);
                         }
                     } else {
                         // No itinerary exists yet for this user; create empty
@@ -199,25 +199,28 @@ public class LoginFragment extends Fragment {
                 });
     }
 
+    // save the itinerary to the fire store
     private void saveItineraryToFirestore() {
         if (!UserSessionManager.getInstance().isLoggedIn()) return; // only save if logged in
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = UserSessionManager.getInstance().getUserId();
 
+        // creates the fields for the document
         Map<String, Object> data = new HashMap<>();
         data.put("items", UserSessionManager.getInstance().getItineraryList());
         data.put("timestamp", System.currentTimeMillis());
 
         db.collection("itineraries")
                 .document(userId)
-                .set(data, SetOptions.merge())
+                .set(data, SetOptions.merge())// sets the data, merges with the current document
                 .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
                 .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
     }
 
+    // sends password reset email
     private void sendPasswordReset(String email) {
-        fba.sendPasswordResetEmail(email)
+        fba.sendPasswordResetEmail(email) // sends to the provided email the password reset
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(getActivity(),

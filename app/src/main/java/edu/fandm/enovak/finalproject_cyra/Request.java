@@ -1,0 +1,99 @@
+package edu.fandm.enovak.finalproject_cyra;
+
+public class Request {
+
+    // place name
+    private String place;
+    // sender userId
+    private String senderId;
+    // receiver userId
+    private String receiverId;
+    // sender email
+    private String email;
+    // timestamp
+    private long timestamp;
+    // was request accepted or rejected
+    private boolean handled;
+    private String id;
+
+    // Default constructor required for Firebase
+    public Request() {
+
+    }
+
+    public Request(String place, String senderId, String receiverId, String email, long timestamp) {
+        this.id = "";
+        this.place = place;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.email = email;
+        this.timestamp = timestamp;
+        this.handled = false;
+    }
+
+    public Request(String id, String place, String senderId, String receiverId, String email, long timestamp) {
+        this.id = id;
+        this.place = place;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.email = email;
+        this.timestamp = timestamp;
+        this.handled = false;
+    }
+
+    // Getters and setters
+    public String getPlace() {
+        return place;
+    }
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
+    public String getReceiverId() {
+        return receiverId;
+    }
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean isHandled() {
+        return handled;
+    }
+    public void setHandled(boolean handled) {
+        this.handled = handled;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "Email: " + this.email + "\nPlace: " + place;
+    }
+}

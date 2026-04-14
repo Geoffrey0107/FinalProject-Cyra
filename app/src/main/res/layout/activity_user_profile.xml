@@ -25,7 +25,7 @@
         android:layout_height="120dp"
         android:scaleType="centerCrop"
         android:layout_marginTop="24dp"
-        android:src="@android:drawable/sym_def_app_icon"
+        android:src="@drawable/outline_person_24"
         android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,14 +33,14 @@
 
     <Button
         android:id="@+id/btn_select_image"
-        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select Picture"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profile_image" />
+        app:layout_constraintTop_toBottomOf="@id/profile_image"
+        android:backgroundTint="@color/forest_green_dark"/>
 
     <EditText
         android:id="@+id/et_name"
@@ -89,6 +89,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/forest_green_dark"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

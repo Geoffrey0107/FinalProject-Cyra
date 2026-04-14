@@ -120,6 +120,8 @@ public class PostAdapter extends BaseAdapter {
             intent.putExtra("place_country", currentPost.getCountry());
             intent.putExtra("place_state", currentPost.getState());
             intent.putExtra("place_city", currentPost.getCity());
+            intent.putExtra("post_user_id", currentPost.getUserId());
+            intent.putExtra("post_username", currentPost.getUsername());
             activity.startActivity(intent);
         });
 

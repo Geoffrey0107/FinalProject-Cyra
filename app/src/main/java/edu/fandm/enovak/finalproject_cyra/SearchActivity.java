@@ -56,7 +56,7 @@ public class SearchActivity extends AppCompatActivity {
         ImageView ivActivityIcon = findViewById(R.id.ivSearchIcon);
         TextView tvActivityText = findViewById(R.id.tvSearchText);
 
-        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+        int activeColor = android.graphics.Color.parseColor("#4DA3FF");
 
         ivActivityIcon.setColorFilter(activeColor);
         tvActivityText.setTextColor(activeColor);

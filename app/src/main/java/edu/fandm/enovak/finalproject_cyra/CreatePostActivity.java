@@ -58,7 +58,7 @@ public class CreatePostActivity extends AppCompatActivity {
         ImageView ivActivityIcon = findViewById(R.id.ivPostIcon);
         TextView tvActivityText = findViewById(R.id.tvPostIcon);
 
-        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+        int activeColor = android.graphics.Color.parseColor("#4DA3FF");
 
         ivActivityIcon.setColorFilter(activeColor);
         tvActivityText.setTextColor(activeColor);

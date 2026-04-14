@@ -11,7 +11,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,7 +40,6 @@ public class ItineraryActivity extends AppCompatActivity {
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
         itineraryListView = findViewById(R.id.itineraryListView);
-        ImageButton btnShare = findViewById(R.id.share_button);
 
         if (itineraryListView == null) {
             throw new RuntimeException("ListView not found");
@@ -98,9 +98,40 @@ public class ItineraryActivity extends AppCompatActivity {
         itineraryListView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedPlace = UserSessionManager.getInstance().getItineraryList().get(position);
 
-            Intent intent = new Intent(ItineraryActivity.this, PlaceDetails.class);
-            intent.putExtra("place_name", selectedPlace);
-            startActivity(intent);
+            FirebaseFirestore.getInstance()
+                    .collection("posts")
+                    .whereEqualTo("title", selectedPlace)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            Toast.makeText(ItineraryActivity.this, "Place not found", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
+                        Post post = doc.toObject(Post.class);
+
+                        if (post == null) {
+                            Toast.makeText(ItineraryActivity.this, "Error loading place", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Intent intent = new Intent(ItineraryActivity.this, PlaceDetails.class);
+                        intent.putExtra("place_title", post.getTitle());
+                        intent.putExtra("place_description", post.getDescription());
+                        intent.putExtra("place_image_url", post.getImageUrl());
+                        intent.putExtra("place_country", post.getCountry());
+                        intent.putExtra("place_state", post.getState());
+                        intent.putExtra("place_city", post.getCity());
+                        intent.putExtra("post_user_id", post.getUserId());
+                        intent.putExtra("post_username", post.getUsername());
+                        startActivity(intent);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(ItineraryActivity.this, "Failed to load place", Toast.LENGTH_SHORT).show();
+                    });
         });
 
         ImageButton ib = (ImageButton) findViewById(R.id.share_button);
@@ -111,7 +142,7 @@ public class ItineraryActivity extends AppCompatActivity {
                 StringBuilder itineraryText = new StringBuilder();
                 itineraryText.append("My itinerary:\n\n");
 
-                for (String item : ItineraryData.itineraryList) {
+                for (String item : UserSessionManager.getInstance().getItineraryList()) {
                     itineraryText.append("• ").append(item).append("\n");
                 }
                 Intent shareIntent = new Intent();

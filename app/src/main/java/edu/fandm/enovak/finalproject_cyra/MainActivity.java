@@ -91,8 +91,11 @@ public class MainActivity extends AppCompatActivity {
         saveSelectedLocation();
         tvTopLocation.setText(selectedCity);
         ImageView ivActivityIcon = findViewById(R.id.ivActivityIcon);
+        ImageView ivChatIcon  = findViewById(R.id.ivChatIcon);
         TextView tvActivityText = findViewById(R.id.tvActivityText);
+        TextView tvChatText = findViewById(R.id.tvChatText);
 
+        int inactiveColor = android.graphics.Color.parseColor("#D3D3D3");
         int activeColor = android.graphics.Color.parseColor("#4DA3FF");
 
         ivActivityIcon.setColorFilter(activeColor);
@@ -146,6 +149,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         navChat.setOnClickListener(v -> {
+            if (!UserSessionManager.getInstance().getCommsStatus()) {
+                Toast.makeText(MainActivity.this, "Connection mode is off", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(MainActivity.this, InboxActivity.class);
             startActivity(intent);
         });
@@ -153,14 +161,9 @@ public class MainActivity extends AppCompatActivity {
         // initial state setup
         isConnectionMode = UserSessionManager.getInstance().getCommsStatus();
 
-        if (!isConnectionMode) {
-            navChat.setEnabled(false);
-        } else {
-            navChat.setEnabled(true);
-        }
-
         connectionToggle.setChecked(isConnectionMode);
         tvConnectionLabel.setText(isConnectionMode ? "On" : "Off");
+        updateChatAvailability(isConnectionMode, ivChatIcon, tvChatText);
 
         connectionToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
@@ -176,19 +179,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (isChecked) {
-                // ON
                 tvConnectionLabel.setText("On");
                 Toast.makeText(this, "Connection Mode ON", Toast.LENGTH_SHORT).show();
-                UserSessionManager.getInstance().setComms(isChecked); // update comms
-
-                navChat.setVisibility(View.VISIBLE);
+                UserSessionManager.getInstance().setComms(true);
+                updateChatAvailability(true, ivChatIcon, tvChatText);
             } else {
-                // OFF
                 tvConnectionLabel.setText("Off");
                 Toast.makeText(this, "Connection Mode OFF", Toast.LENGTH_SHORT).show();
-                UserSessionManager.getInstance().setComms(isChecked);
-
-                navChat.setVisibility(View.INVISIBLE);
+                UserSessionManager.getInstance().setComms(false);
+                updateChatAvailability(false, ivChatIcon, tvChatText);
             }
 
             db.collection("users")
@@ -303,5 +302,16 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(MainActivity.this, "Failed to load locations", Toast.LENGTH_SHORT).show();
                 });
+    }
+    private void updateChatAvailability(boolean enabled, ImageView ivChatIcon, TextView tvChatText) {
+        int activeColor = android.graphics.Color.parseColor("#000000");
+        int inactiveColor = android.graphics.Color.parseColor("#A9A9A9");
+
+        navChat.setEnabled(enabled);
+        navChat.setClickable(enabled);
+        navChat.setAlpha(enabled ? 1.0f : 0.45f);
+
+        ivChatIcon.setColorFilter(enabled ? activeColor : inactiveColor);
+        tvChatText.setTextColor(enabled ? activeColor : inactiveColor);
     }
 }

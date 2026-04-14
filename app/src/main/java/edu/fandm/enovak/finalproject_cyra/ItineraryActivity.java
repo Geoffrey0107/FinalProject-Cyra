@@ -30,7 +30,10 @@ public class ItineraryActivity extends AppCompatActivity {
     ListView itineraryListView;
     ArrayAdapter<String> adapter;
 
-    LinearLayout navActivity, navItinerary, navPost,navSearch;
+    LinearLayout navActivity, navItinerary, navPost,navSearch,navChat;
+
+    ImageView ivChatIcon;
+    TextView tvChatText;
 
 
     @Override
@@ -42,6 +45,12 @@ public class ItineraryActivity extends AppCompatActivity {
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
+        navChat = findViewById(R.id.navChat);
+
+        ImageView ivChatIcon = findViewById(R.id.ivChatIcon);
+        TextView tvChatText = findViewById(R.id.ivChatText);
+
+        setupChatUI(navChat, ivChatIcon, tvChatText);
 
         ImageView ivItineraryIcon = findViewById(R.id.ivItineraryIcon);
         TextView tvItineraryText = findViewById(R.id.tvItineraryText);
@@ -92,6 +101,15 @@ public class ItineraryActivity extends AppCompatActivity {
                     .show();
 
             return true;
+        });
+        navChat.setOnClickListener(v -> {
+            if (!UserSessionManager.getInstance().getCommsStatus()) {
+                Toast.makeText(ItineraryActivity.this, "Connection mode is off", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(ItineraryActivity.this, InboxActivity.class);
+            startActivity(intent);
         });
         navActivity.setOnClickListener(v -> {
             Intent intent = new Intent(ItineraryActivity.this, MainActivity.class);
@@ -165,6 +183,15 @@ public class ItineraryActivity extends AppCompatActivity {
                 startActivity(Intent.createChooser(shareIntent, "Share via"));
             }
         });
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (navChat != null && ivChatIcon != null && tvChatText != null) {
+            setupChatUI(navChat, ivChatIcon, tvChatText);
+        }
     }
 
     public void saveItineraryToFirestore() {
@@ -182,5 +209,18 @@ public class ItineraryActivity extends AppCompatActivity {
                 .set(data, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Itinerary saved successfully"))
                 .addOnFailureListener(e -> Log.e("FIRESTORE", "Error saving itinerary", e));
+    }
+    private void setupChatUI(LinearLayout navChat, ImageView ivChatIcon, TextView tvChatText) {
+        boolean enabled = UserSessionManager.getInstance().getCommsStatus();
+
+        int defaultColor = android.graphics.Color.parseColor("#000000");
+        int inactiveColor = android.graphics.Color.parseColor("#A9A9A9");
+
+        navChat.setEnabled(enabled);
+        navChat.setClickable(enabled);
+        navChat.setAlpha(enabled ? 1.0f : 0.4f);
+
+        ivChatIcon.setColorFilter(enabled ? defaultColor : inactiveColor);
+        tvChatText.setTextColor(enabled ? defaultColor : inactiveColor);
     }
 }

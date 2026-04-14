@@ -35,6 +35,9 @@ public class CreatePostActivity extends AppCompatActivity {
     private Uri imageUri;
     private ActivityResultLauncher<String> imagePickerLauncher;
 
+    ImageView ivChatIcon;
+    TextView tvChatText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,12 @@ public class CreatePostActivity extends AppCompatActivity {
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
         navSearch = findViewById(R.id.navSearch);
+        navChat = findViewById(R.id.navChat);
+
+        ImageView ivChatIcon = findViewById(R.id.ivChatIcon);
+        TextView tvChatText = findViewById(R.id.ivChatText);
+
+        setupChatUI(navChat, ivChatIcon, tvChatText);
 
         etCountry = findViewById(R.id.etCountry);
         etState = findViewById(R.id.etState);
@@ -88,6 +97,15 @@ public class CreatePostActivity extends AppCompatActivity {
                 Intent intent = new Intent(CreatePostActivity.this, ItineraryActivity.class);
                 startActivity(intent);
             }
+        });
+        navChat.setOnClickListener(v -> {
+            if (!UserSessionManager.getInstance().getCommsStatus()) {
+                Toast.makeText(CreatePostActivity.this, "Connection mode is off", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(CreatePostActivity.this, InboxActivity.class);
+            startActivity(intent);
         });
         navSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,5 +222,26 @@ public class CreatePostActivity extends AppCompatActivity {
         db.collection("locations")
                 .document(locationId)
                 .set(locationMap);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (navChat != null && ivChatIcon != null && tvChatText != null) {
+            setupChatUI(navChat, ivChatIcon, tvChatText);
+        }
+    }
+    private void setupChatUI(LinearLayout navChat, ImageView ivChatIcon, TextView tvChatText) {
+        boolean enabled = UserSessionManager.getInstance().getCommsStatus();
+
+        int defaultColor = android.graphics.Color.parseColor("#000000");
+        int inactiveColor = android.graphics.Color.parseColor("#A9A9A9");
+
+        navChat.setEnabled(enabled);
+        navChat.setClickable(enabled);
+        navChat.setAlpha(enabled ? 1.0f : 0.4f);
+
+        ivChatIcon.setColorFilter(enabled ? defaultColor : inactiveColor);
+        tvChatText.setTextColor(enabled ? defaultColor : inactiveColor);
     }
 }

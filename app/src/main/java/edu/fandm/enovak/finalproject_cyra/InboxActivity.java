@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -23,6 +25,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +58,13 @@ public class InboxActivity extends AppCompatActivity {
 
         inboxListView = findViewById(R.id.inboxListView);
 
+        ImageView ivChatIcon  = findViewById(R.id.tvChatImage);
+        TextView ivChatText  = findViewById(R.id.tvChatText);
+
+        int activeColor = android.graphics.Color.parseColor("#4DA3FF");
+
+        ivChatIcon.setColorFilter(activeColor);
+        ivChatText.setTextColor(activeColor);
         inboxAdapter = new ArrayAdapter<>(
             this, // Context
             android.R.layout.simple_list_item_1, // Built-in layout (TextView)

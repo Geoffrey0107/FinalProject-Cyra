@@ -44,7 +44,7 @@ public class ItineraryActivity extends AppCompatActivity {
         ImageView ivItineraryIcon = findViewById(R.id.ivItineraryIcon);
         TextView tvItineraryText = findViewById(R.id.tvItineraryText);
 
-        int activeColor = android.graphics.Color.parseColor("#1E3A5F");
+        int activeColor = android.graphics.Color.parseColor("#4DA3FF");
 
         ivItineraryIcon.setColorFilter(activeColor);
         tvItineraryText.setTextColor(activeColor);

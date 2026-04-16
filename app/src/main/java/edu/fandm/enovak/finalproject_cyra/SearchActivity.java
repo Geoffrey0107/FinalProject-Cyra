@@ -2,139 +2,138 @@ package edu.fandm.enovak.finalproject_cyra;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.AutoCompleteTextView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+
 public class SearchActivity extends AppCompatActivity {
 
-    private static final String[] places = {
-            "Lancaster, PA, United States",
-            "Tokyo, Japan",
-            "London, United Kingdom",
-            "New York City, United States",
-            "Paris, France",
-            "Berlin, Germany",
-            "Seoul, South Korea",
-            "Sydney, Australia",
-            "Mumbai, India",
-            "Sao Paulo, Brazil",
-            "Cairo, Egypt",
-            "Toronto, Canada",
-            "Mexico City, Mexico",
-            "Rome, Italy",
-            "Shanghai, China",
-            "Lagos, Nigeria",
-            "Istanbul, Turkey",
-            "Bangkok, Thailand",
-            "Buenos Aires, Argentina",
-            "Dubai, United Arab Emirates",
-            "Singapore, Singapore"
-    };
-
     private TextView textSearchQuery;
-    ImageView ivChatIcon;
-    TextView ivChatText;
+    private AutoCompleteTextView actv;
+    private LinearLayout resultsContainer;
 
-    LinearLayout navActivity, navItinerary, navPost,navChat;
+    LinearLayout navActivity, navItinerary, navPost, navChat, navSearch;
+
+    private FirebaseFirestore db;
+    private ArrayList<Post> allPosts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        db = FirebaseFirestore.getInstance();
 
         textSearchQuery = findViewById(R.id.textSearchQuery);
+        actv = findViewById(R.id.autocomplete_tv);
+        resultsContainer = findViewById(R.id.resultsContainer);
 
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+        navChat = findViewById(R.id.navChat);
+        navSearch = findViewById(R.id.navSearch);
 
-        ImageView ivChatIcon = findViewById(R.id.ivChatIcon);
-        TextView ivChatText = findViewById(R.id.ivChatText);
-        LinearLayout navChat = findViewById(R.id.navChat);
+        navItinerary.setOnClickListener(v ->
+                startActivity(new Intent(SearchActivity.this, ItineraryActivity.class)));
 
-        setupChatUI(navChat, ivChatIcon, ivChatText);
+        navActivity.setOnClickListener(v ->
+                startActivity(new Intent(SearchActivity.this, MainActivity.class)));
 
-        ImageView ivActivityIcon = findViewById(R.id.ivSearchIcon);
-        TextView tvActivityText = findViewById(R.id.tvSearchText);
+        navPost.setOnClickListener(v ->
+                startActivity(new Intent(SearchActivity.this, CreatePostActivity.class)));
 
-        int activeColor = android.graphics.Color.parseColor("#4DA3FF");
+        loadPosts();
 
-        ivActivityIcon.setColorFilter(activeColor);
-        tvActivityText.setTextColor(activeColor);
-
-        navItinerary.setOnClickListener(new View.OnClickListener() {
+        actv.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SearchActivity.this, ItineraryActivity.class);
-                startActivity(intent);
-            }
-        });
-        navChat.setOnClickListener(v -> {
-            if (!UserSessionManager.getInstance().getCommsStatus()) {
-                Toast.makeText(SearchActivity.this, "Connection mode is off", Toast.LENGTH_SHORT).show();
-                return;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
-            Intent intent = new Intent(SearchActivity.this, InboxActivity.class);
-            startActivity(intent);
-        });
-        navActivity.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SearchActivity.this, MainActivity.class);
-                startActivity(intent);
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterPosts(s.toString());
             }
-        });
-        navPost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SearchActivity.this, CreatePostActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        String query = getIntent().getStringExtra("SEARCH_QUERY");
-        if (query != null && !query.isEmpty()) {
-            textSearchQuery.setText("Showing results for: \"" + query + "\"");
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+    private void loadPosts() {
+        db.collection("posts")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    allPosts.clear();
+
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Post post = doc.toObject(Post.class);
+                        if (post != null) {
+                            allPosts.add(post);
+                        }
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(SearchActivity.this, "Failed to load posts", Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    private void filterPosts(String query) {
+        resultsContainer.removeAllViews();
+
+        if (query == null || query.trim().isEmpty()) {
+            return;
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getApplicationContext(),
-                android.R.layout.simple_dropdown_item_1line,places);
+        String lowerQuery = query.toLowerCase().trim();
 
-        AutoCompleteTextView actv = (AutoCompleteTextView)findViewById(R.id.autocomplete_tv);
-        actv.setAdapter(adapter);
-        actv.setThreshold(1);
+        for (Post post : allPosts) {
+            if (post.getTitle() != null &&
+                    post.getTitle().toLowerCase().contains(lowerQuery)) {
 
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
+                Button btn = new Button(this);
+                btn.setText(post.getTitle());
+                btn.setAllCaps(false);
+                btn.setPadding(20, 20, 20, 20);
 
-        if (navChat != null && ivChatIcon != null && ivChatText != null) {
-            setupChatUI(navChat, ivChatIcon, ivChatText);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(0, 20, 0, 0);
+                btn.setLayoutParams(params);
+
+                btn.setOnClickListener(v -> openPost(post));
+
+                resultsContainer.addView(btn);
+            }
         }
     }
-    private void setupChatUI(LinearLayout navChat, ImageView ivChatIcon, TextView tvChatText) {
-        boolean enabled = UserSessionManager.getInstance().getCommsStatus();
 
-        int defaultColor = android.graphics.Color.parseColor("#000000");
-        int inactiveColor = android.graphics.Color.parseColor("#A9A9A9");
+    private void openPost(Post post) {
+        Intent intent = new Intent(SearchActivity.this, PlaceDetails.class);
 
-        navChat.setEnabled(enabled);
-        navChat.setClickable(enabled);
-        navChat.setAlpha(enabled ? 1.0f : 0.4f);
+        intent.putExtra("place_title", post.getTitle());
+        intent.putExtra("place_description", post.getDescription());
+        intent.putExtra("place_city", post.getCity());
+        intent.putExtra("place_state", post.getState());
+        intent.putExtra("place_country", post.getCountry());
+        intent.putExtra("place_image_url", post.getImageUrl());
+        intent.putExtra("post_user_id", post.getUserId());
+        intent.putExtra("post_username", post.getUsername());
 
-        ivChatIcon.setColorFilter(enabled ? defaultColor : inactiveColor);
-        tvChatText.setTextColor(enabled ? defaultColor : inactiveColor);
+        startActivity(intent);
     }
 }

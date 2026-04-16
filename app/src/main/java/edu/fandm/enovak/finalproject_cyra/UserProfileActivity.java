@@ -99,7 +99,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private void saveProfile() {
         String name = etName.getText().toString().trim();
 
-        if (UserSessionManager.getInstance().isLoggedIn()) {
+        if (!UserSessionManager.getInstance().isLoggedIn()) {
             Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
             return;
         }

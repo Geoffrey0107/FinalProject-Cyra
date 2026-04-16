@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,8 @@ public class SearchActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private ArrayList<Post> allPosts = new ArrayList<>();
+    ImageView ivChatIcon;
+    TextView tvChatText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,20 @@ public class SearchActivity extends AppCompatActivity {
         navChat = findViewById(R.id.navChat);
         navSearch = findViewById(R.id.navSearch);
 
+        ImageView ivChatIcon = findViewById(R.id.ivChatIcon);
+        TextView tvChatText = findViewById(R.id.ivChatText);
+
+        ImageView ivItineraryIcon = findViewById(R.id.ivSearchIcon);
+        TextView tvItineraryText = findViewById(R.id.ivSearchText);
+
+        int activeColor = android.graphics.Color.parseColor("#4DA3FF");
+
+        ivItineraryIcon.setColorFilter(activeColor);
+        tvItineraryText.setTextColor(activeColor);
+
+
+        setupChatUI(navChat, ivChatIcon, tvChatText);
+
         navItinerary.setOnClickListener(v ->
                 startActivity(new Intent(SearchActivity.this, ItineraryActivity.class)));
 
@@ -53,6 +70,16 @@ public class SearchActivity extends AppCompatActivity {
 
         navPost.setOnClickListener(v ->
                 startActivity(new Intent(SearchActivity.this, CreatePostActivity.class)));
+
+        navChat.setOnClickListener(v -> {
+            if (!UserSessionManager.getInstance().getCommsStatus()) {
+                Toast.makeText(SearchActivity.this, "Connection mode is off", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(SearchActivity.this, InboxActivity.class);
+            startActivity(intent);
+        });
 
         loadPosts();
 
@@ -135,5 +162,26 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra("post_username", post.getUsername());
 
         startActivity(intent);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (navChat != null && ivChatIcon != null && tvChatText != null) {
+            setupChatUI(navChat, ivChatIcon, tvChatText);
+        }
+    }
+    private void setupChatUI(LinearLayout navChat, ImageView ivChatIcon, TextView tvChatText) {
+        boolean enabled = UserSessionManager.getInstance().getCommsStatus();
+
+        int defaultColor = android.graphics.Color.parseColor("#000000");
+        int inactiveColor = android.graphics.Color.parseColor("#A9A9A9");
+
+        navChat.setEnabled(enabled);
+        navChat.setClickable(enabled);
+        navChat.setAlpha(enabled ? 1.0f : 0.4f);
+
+        ivChatIcon.setColorFilter(enabled ? defaultColor : inactiveColor);
+        tvChatText.setTextColor(enabled ? defaultColor : inactiveColor);
     }
 }

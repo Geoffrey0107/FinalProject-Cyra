@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
                     .document(userId)
                     .update("showLocation", isChecked)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(this, "Failed to update", Toast.LENGTH_SHORT).show();

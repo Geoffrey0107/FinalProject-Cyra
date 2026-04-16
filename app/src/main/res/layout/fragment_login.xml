@@ -9,7 +9,8 @@
     android:orientation="vertical"
     android:gravity="center"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:padding="24dp">
 
     <EditText
         android:id="@+id/login_email"

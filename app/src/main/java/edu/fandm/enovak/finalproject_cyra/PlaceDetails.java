@@ -35,7 +35,9 @@ public class PlaceDetails extends AppCompatActivity {
     private ImageView posterProfileImage;
     private TextView posterName;
 
-    LinearLayout navActivity, navItinerary, navPost;
+    LinearLayout navActivity, navItinerary, navPost,navChat,navSearch;
+    ImageView ivChatIcon;
+    TextView ivChatText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,14 @@ public class PlaceDetails extends AppCompatActivity {
         navActivity = findViewById(R.id.navActivity);
         navItinerary = findViewById(R.id.navItinerary);
         navPost = findViewById(R.id.navPost);
+        navChat = findViewById(R.id.navChat);
+        navSearch = findViewById(R.id.navSearch);
+
+        ImageView ivChatIcon = findViewById(R.id.ivChatIcon);
+        TextView ivChatText = findViewById(R.id.ivChatText);
+
+        setupChatUI(navChat, ivChatIcon, ivChatText);
+
         reviewsContainer = findViewById(R.id.reviewsContainer);
         if (postUsername != null && !postUsername.isEmpty()) {
             posterName.setText("Posted by " + postUsername);
@@ -123,6 +133,20 @@ public class PlaceDetails extends AppCompatActivity {
 
         navItinerary.setOnClickListener(v -> {
             Intent intent = new Intent(PlaceDetails.this, ItineraryActivity.class);
+            startActivity(intent);
+        });
+        navSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(PlaceDetails.this, SearchActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        navChat.setOnClickListener(v -> {
+            if (!UserSessionManager.getInstance().getCommsStatus()) {
+                Toast.makeText(PlaceDetails.this, "Connection mode is off", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(PlaceDetails.this, InboxActivity.class);
             startActivity(intent);
         });
     }
@@ -189,9 +213,27 @@ public class PlaceDetails extends AppCompatActivity {
                 });
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
         loadReviews(placeName.getText().toString());
+        if (navChat != null && ivChatIcon != null && ivChatText != null) {
+            setupChatUI(navChat, ivChatIcon, ivChatText);
+        }
+    }
+
+    private void setupChatUI(LinearLayout navChat, ImageView ivChatIcon, TextView tvChatText) {
+        boolean enabled = UserSessionManager.getInstance().getCommsStatus();
+
+        int defaultColor = android.graphics.Color.parseColor("#000000");
+        int inactiveColor = android.graphics.Color.parseColor("#A9A9A9");
+
+        navChat.setEnabled(enabled);
+        navChat.setClickable(enabled);
+        navChat.setAlpha(enabled ? 1.0f : 0.4f);
+
+        ivChatIcon.setColorFilter(enabled ? defaultColor : inactiveColor);
+        tvChatText.setTextColor(enabled ? defaultColor : inactiveColor);
     }
 }
